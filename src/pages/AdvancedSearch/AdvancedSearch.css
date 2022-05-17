@@ -1,0 +1,30 @@
+#asearchContent {
+    display: table-cell;
+    width: 85%;
+    vertical-align: top;
+}
+
+#form {
+    margin: 50px;
+    padding: 20px;
+}
+#results {
+    margin: 50px;
+    padding: 25px;
+    width: 100%;
+    overflow: auto;
+    height: 500px;
+}
+
+.alabel {
+    padding-bottom: 10px;
+}
+.pcol {
+    padding: 15px;
+    margin-left: 5px;
+    margin-right: 5px;
+}
+  
+.input-range {
+    margin-bottom: 50px;
+}

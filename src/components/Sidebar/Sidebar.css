@@ -1,0 +1,18 @@
+#sidebar {
+    position: fixed;
+    width: 250px;
+    display: table-cell;
+    width: 15%;
+    height: 100vh;
+    z-index: 999;
+    background: #7386D5;
+    color: #fff;
+}
+
+.nav-item {
+    padding-top: 20px;
+}
+
+#logout {
+    margin-top: 480px;
+}
