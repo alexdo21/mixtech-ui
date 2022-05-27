@@ -2,51 +2,44 @@ import React from "react";
 import PropTypes from "prop-types"
 import Modal from "react-responsive-modal"
 import { PlaylistSongs } from "../../components"
-import { allPlaylists, addPlaylist, deletePlaylist, getAllSongsInPlaylist } from "../../actions"
+import { getAllPlaylists, createPlaylist, deletePlaylist, getAllSongsInPlaylist } from "../../actions"
 import { connect } from "react-redux"
 import "./Playlists.css"
 
 
-function Playlist({allPlaylists, addPlaylist, deletePlaylist, getAllSongsInPlaylist, results, songs}) {
+function Playlist({getAllPlaylists, createPlaylist, deletePlaylist, getAllSongsInPlaylist, playlists, playlistSongs}) {
     const [openModal, setOpenModal] = React.useState(false)
     const [songsModal, setSongsModal] = React.useState(false)
     const [playlist, setPlaylist] = React.useState(null)
-    const [pname, setPname] = React.useState("")
+    const [playlistName, setPlaylistName] = React.useState("")
     const [description, setDescription] = React.useState("")
 
-    React.useState(() => {
+    React.useEffect(() => {
         const fetchPlaylists = async () => {
-            await allPlaylists()
+            await getAllPlaylists()
         }
         fetchPlaylists()
-    }, [allPlaylists])
+    }, [getAllPlaylists, openModal])
     
     const onOpenModal = () => setOpenModal(true)
     const onCloseModal = () => setOpenModal(false)
-    const handlePname = (event) => setPname(event.target.value)
+    const handlePlaylistName = (event) => setPlaylistName(event.target.value)
     const handleDescription = (event) => setDescription(event.target.value)
-    const handleSubmit = (event) => {
+    const handleSubmit = async (event) => {
         event.preventDefault()
         const data = {
-            pname: pname,
-            privacy: 0,
+            name: playlistName,
             description: description
         }
-        addPlaylist(data)
-        window.location.reload()
-        
+        await createPlaylist(data)
+        await getAllPlaylists()
     }
     const onOpenPlaylist = async (event) => {
-        setPlaylist(event.target.selected)
-        if (playlist !== null) {
-            await getAllSongsInPlaylist(playlist.pid)
-        }
-        setSongsModal(true)
+        await getAllSongsInPlaylist(event.target.selected.id)
     }
     const onClosePlaylist = () => setSongsModal(false)
     const handleDeletePlaylist = async (event) => {
         await deletePlaylist(event.target.value)
-        window.location.reload()
     }
 
     return (
@@ -65,11 +58,11 @@ function Playlist({allPlaylists, addPlaylist, deletePlaylist, getAllSongsInPlayl
                         </tr>
                     </thead>
                     <tbody>
-                        {results.map((playlist, i) => 
+                        {playlists.map((playlist, i) => 
                             <tr key={i}>
-                                <td><button className="btn btn-light btn-lg" selected={playlist} onClick={onOpenPlaylist}>{playlist.pname}</button></td>
+                                <td><button className="btn btn-light btn-lg" selected={playlist} onClick={(event) => {onOpenPlaylist(event).then(() => {setPlaylist(event.target.selected); setSongsModal(true)})}}>{playlist.name}</button></td>
                                 <td>{playlist.description}</td>
-                                <td><button className="btn btn-outline-danger btn-sm" value={playlist.pid} onClick={handleDeletePlaylist}>X</button></td>
+                                <td><button className="btn btn-outline-danger btn-sm" value={playlist.id} onClick={handleDeletePlaylist}>X</button></td>
                             </tr>     
                         )}
                     </tbody>
@@ -77,10 +70,10 @@ function Playlist({allPlaylists, addPlaylist, deletePlaylist, getAllSongsInPlayl
             </div>
             <Modal open={openModal} onClose={onCloseModal}>
                 <div className="container">
-                    <form onSubmit={handleSubmit}>
+                    <form onSubmit={(event) => handleSubmit(event).then(() => setOpenModal(false))}>
                         <div className="form-group">
                             <label>Playlist Name</label>
-                            <input type="text" className="form-control" name="pname" onChange={handlePname}></input>
+                            <input type="text" className="form-control" name="playlistName" onChange={handlePlaylistName}></input>
                         </div>
                         <div className="form-group">
                             <label>Description</label>
@@ -90,22 +83,22 @@ function Playlist({allPlaylists, addPlaylist, deletePlaylist, getAllSongsInPlayl
                     </form>
                 </div>
             </Modal>
-            <PlaylistSongs open={songsModal} onClose={onClosePlaylist} playlist={playlist} songs={songs}/>
+            <PlaylistSongs open={songsModal} onClose={onClosePlaylist} playlist={playlist} playlistSongs={playlistSongs}/>
         </div>
     );
 }
 
-Playlist.propType = {
-    allPlaylists: PropTypes.func.isRequired,
-    addPlaylist: PropTypes.func,
+Playlist.propTypes = {
+    getAllPlaylists: PropTypes.func.isRequired,
+    createPlaylist: PropTypes.func,
     deletePlaylist: PropTypes.func,
-    results: PropTypes.array,
-    songs: PropTypes.array
+    playlists: PropTypes.array,
+    playlistSongs: PropTypes.array
 };
 
 const mapStateToProps = state => ({
-    results: state.playlists.results,
-    songs: state.playlists.songs
+    playlists: state.playlistReducer.playlists,
+    playlistSongs: state.playlistReducer.playlistSongs
 });
 
-export const ConnectedPlaylists = connect(mapStateToProps, { allPlaylists, addPlaylist, deletePlaylist, getAllSongsInPlaylist })(Playlist);
+export const ConnectedPlaylists = connect(mapStateToProps, { getAllPlaylists, createPlaylist, deletePlaylist, getAllSongsInPlaylist })(Playlist);

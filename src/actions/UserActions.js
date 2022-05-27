@@ -1,82 +1,51 @@
-import { USER_ENDPOINT } from "."
+import { USER_ENDPOINT, REQUEST } from "."
+import { LOGIN_SUCCESS, LOGIN_FAILURE, GET_USER_INFO, LOGOUT } from "./types"
 
-/**
- * Actions mapping to the user route and calling various functionalities.
- * Dispatches to UserAuthReducer.js to change user state.
- */
+const getUrlParameter = (name) => {
+    name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+    var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+    var results = regex.exec(window.location.search);
+    return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+};
 
-/**
- * Logs in a user given proper credentials.
- * Returns error message if not. Stores
- * JWT token in local storage in order to persist
- * user info.
- */
-const login = (creds) => dispatch => {
-    dispatch({type: "LOGIN_REQUEST"})
-    fetch(`${USER_ENDPOINT}/login?email=${creds.email}&password=${creds.password}`, {
-            method: "POST",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json())
-        .then(res => {
-            if (res.ret === 1) {
-                localStorage.setItem("uname", res.uname)
-                localStorage.setItem("uid", res.uid)
-                localStorage.setItem("token", res.token)
-                dispatch({
-                    type: "LOGIN_SUCCESS",
-                })
-            } else {
-                dispatch({
-                    type: "LOGIN_FAILURE",
-                    error: res.msg
-                })
-            }
-        }).catch(err => {console.log(err)})
+const login = () => dispatch => {
+    const token = getUrlParameter("token")
+    const error = getUrlParameter("error")
+    console.log(token)
+    console.log(error)
+    if (token) {
+        localStorage.setItem("access_token", token)
+        dispatch({ type: LOGIN_SUCCESS })
+    } else {
+        dispatch({ type: LOGIN_FAILURE, error: error })
+    }
 }
 
-/**
- * Logs current user out.
- */
 const logout = () => dispatch => {
     console.log("logging out...")
     localStorage.removeItem("uname")
     localStorage.removeItem("uid")
     localStorage.removeItem("token")
-    dispatch({type: "LOGOUT"})
+    dispatch({type: LOGOUT})
 }
 
-/**
- * Registers a new user, returns error message if failed.
- * @param {*} creds 
- */
-const register = (creds) => dispatch => {
-    dispatch({type: "REGISTER_REQUEST"})
-    fetch(`${USER_ENDPOINT}/register`, {
-            method: "POST",
-            crossDomain: true,
-            body: JSON.stringify(creds),
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(res => res.json())
-        .then(res => {
-            if (res.ret === 1) {
-                localStorage.setItem("uname", res.uname)
-                localStorage.setItem("uid", res.uid)
-                localStorage.setItem("token", res.token)
-                dispatch({
-                    type: "REGISTER_SUCCESS",
-                })
-            } else {
-                dispatch({
-                    type: "REGISTER_FAILURE",
-                    error: res.msg
-                })
-            }
-        }).catch(err => console.log(err));
+const getUserInfo = () => dispatch => {
+    REQUEST.method = "GET"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    delete REQUEST.body
+    fetch(`${USER_ENDPOINT}/info`, REQUEST)
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === "Success") {
+            const user = res.user
+            dispatch({
+                type: GET_USER_INFO,
+                payload: user
+            })
+        } else {
+            console.log(res.errorMessage)
+        }
+    })
 }
 
-export { login, logout, register };
+export { login, logout, getUserInfo };

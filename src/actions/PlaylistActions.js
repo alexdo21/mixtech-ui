@@ -1,123 +1,93 @@
-import { PLAYLIST_ENDPOINT, PLAYLIST_SONG_ENDPOINT } from ".";
+import { PLAYLIST_ENDPOINT, REQUEST } from ".";
+import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, CREATE_PLAYLIST, ADD_SONG_TO_PLAYLIST, DELETE_PLAYLIST } from "./types"
 
-/**
- * Actions mapping to the playlist route and calling various functionalities.
- * Dispatches to PlaylistReducer.js to change playlist state.
- */
-
-
-/**
- * Gets a list of all playlists.
- */
-const allPlaylists = () => dispatch => {
-    fetch(`${PLAYLIST_ENDPOINT}/all/${localStorage.getItem("uid")}`, {
-        method: "GET",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(res => res.json())
-        .then(res => {
-            const results = res.map(playlist => ({
-                pid: playlist.pid,
-                pname: playlist.pname,
-                privacy: playlist.privacy,
+const getAllPlaylists = () => dispatch => {
+    REQUEST.method = "GET"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    delete REQUEST.body
+    fetch(`${PLAYLIST_ENDPOINT}/all`, REQUEST)
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === "Success") {
+            const results = res.playlists.map(playlist => ({
+                id: playlist.id,
+                name: playlist.name,
                 description: playlist.description
             }));
             dispatch({
-                type: "ALL_PLAYLISTS",
+                type: GET_ALL_PLAYLISTS,
                 payload: results
             })
-        }).catch(err => {console.log(err)});
-
+        } else {
+            console.log(res.errorMessage)
+        }
+    }).catch(err => {console.log(err)});
 };
 
-/**
- * Gets all the songs in a given playlist.
- * @param {*} pid 
- */
-const getAllSongsInPlaylist = (pid) => dispatch => {
-    fetch(`${PLAYLIST_SONG_ENDPOINT}/all/${pid}`, {
-        method: "GET",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(res => res.json())
+const getAllSongsInPlaylist = (playlistId) => dispatch => {
+    REQUEST.method = "GET"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    delete REQUEST.body
+    fetch(`${PLAYLIST_ENDPOINT}/songs/${playlistId}`, REQUEST)
+    .then(res => res.json())
     .then(res => {
-        const songs = res.map(song => ({
-            id: song.spotifyID,
-            name: song.sname,
-            album_name: song.albumName,
-            artist: song.mname,
-            danceability: song.danceability,
-            energy: song.energy,
-            key: song.skey,
-            loudness: song.loudness,
-            mode: song.smode,
-            speechiness: song.speechiness,
-            acousticness: song.acousticness,
-            instrumentalness: song.instrumentalness,
-            liveness: song.liveness,
-            valence: song.valence,
-            tempo: song.tempo,
-            duration: song.durationMs,
-            timesignature: song.timeSignature,
-            popularity: song.popularity
-         }))
-         dispatch({ 
-            type: "GET_ALL_SONGS_IN_PLAYLIST",
-            payload: songs
-        })
+        if (res.status === "Success") {
+            const songs = res.songs.map(song => ({
+                id: song.spotifyId,
+                name: song.name,
+                albumName: song.albumName,
+                artist: song.artistName,
+                danceability: song.danceability,
+                energy: song.energy,
+                key: song.key,
+                loudness: song.loudness,
+                mode: song.mode,
+                speechiness: song.speechiness,
+                acousticness: song.acousticness,
+                instrumentalness: song.instrumentalness,
+                liveness: song.liveness,
+                valence: song.valence,
+                tempo: song.tempo,
+                duration: song.durationMs,
+                timeSignature: song.timeSignature,
+                popularity: song.popularity
+            }))
+            dispatch({ 
+                type: GET_ALL_SONGS_IN_PLAYLIST,
+                payload: songs
+            })
+        } else {
+            console.log(res.errorMessage)
+        }
     }).catch(err => console.log(err))
 }
 
-/**
- * Creates new playlist given appropriate data.
- * @param {*} data 
- */
-const addPlaylist = (data) => dispatch => {
-    fetch(`${PLAYLIST_ENDPOINT}/create/${localStorage.getItem("uid")}`, {
-        method: "POST",
-        crossDomain: true,
-        body: JSON.stringify(data),
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(dispatch({ type: "ADD_PLAYLIST" }))
+const createPlaylist = (data) => dispatch => {
+    REQUEST.method = "POST"
+    REQUEST.body = JSON.stringify(data)
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    fetch(`${PLAYLIST_ENDPOINT}/create`, REQUEST)
+    .then(res => res.json())
+    .then(res => res.status === "Success" ? dispatch({ type: CREATE_PLAYLIST }) : console.log(res.errorMessage))
     .catch(err => console.log(err))
 }
 
-
-/**
- * Adds a song to a given playlist id and song id.
- * @param {*} req 
- */
-const addToExistingPlaylist = (req) => dispatch => {
-    fetch(`${PLAYLIST_SONG_ENDPOINT}/add/${req.playlistID}?spotify_uri=${req.songID}`, {
-            method: "PUT",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(res => console.log(res))
-        .then(dispatch({ type: "ADD_TO_EXISTING_PLAYLIST" }))
-        .catch(err => console.log(err))
+const addSongToPlaylist = (req) => dispatch => {
+    REQUEST.method = "POST"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    fetch(`${PLAYLIST_ENDPOINT}/songs/add/${req.playlistId}?songId=${req.songId}`, REQUEST)
+    .then(res => res.json())
+    .then(res => res.status === "Success" ? dispatch({ type: ADD_SONG_TO_PLAYLIST }) : console.log(res.errorMessage))
+    .catch(err => console.log(err))
 }
 
-/**
- * Deletes the given playlist id.
- * @param {*} pid 
- */
-const deletePlaylist = (pid) => dispatch => {
-    fetch(`${PLAYLIST_ENDPOINT}/delete/${localStorage.getItem("uid")}/${pid}`, {
-            method: "DELETE",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(dispatch({ type: "DELETE_PLAYLIST" }))
-        .catch(err => console.log(err))
+const deletePlaylist = (playlistId) => dispatch => {
+    REQUEST.method = "DELETE"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    fetch(`${PLAYLIST_ENDPOINT}/delete/${playlistId}`, REQUEST)
+    .then(res => res.json())
+    .then(res => res.status === "Success" ? dispatch({ type: DELETE_PLAYLIST, payload: Number(playlistId) }) : console.log(res.errorMessage))
+    .catch(err => console.log(err))
 }
 
-export { allPlaylists, getAllSongsInPlaylist, addPlaylist, addToExistingPlaylist, deletePlaylist };
+export { getAllPlaylists, getAllSongsInPlaylist, createPlaylist, addSongToPlaylist, deletePlaylist };

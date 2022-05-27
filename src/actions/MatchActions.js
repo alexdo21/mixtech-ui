@@ -1,103 +1,103 @@
-import { MATCH_ENDPOINT } from "."
+import { MATCH_ENDPOINT, REQUEST } from "."
+import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, GET_ALL_MATCHES_BY_SONG_NAME, CREATE_MATCH, PAIR_MATCH, DELETE_MATCH } from "./types"
 
-/**
- * Actions mapping to the match route and calling various functionalities.
- * Dispatches to MatchReducer.js to change match state.
- */
-
- /**
-  * Get a list of all complete matches
-  */
-const completeMatches = () => dispatch => {
-    fetch(`${MATCH_ENDPOINT}/complete/${localStorage.getItem("uid")}`, {
-        method: "GET",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(res => res.json())
+const getCompleteMatches = () => dispatch => {
+    REQUEST.method = "GET"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    delete REQUEST.body
+    fetch(`${MATCH_ENDPOINT}/complete`, REQUEST)
+    .then(res => res.json())
     .then(res => {
-        const results = res.map(match => ({
-            matchID: match.mid,
-            song1: match.sname1,
-            song2: match.sname2
-        }))
-        dispatch({
-            type: "COMPLETE_MATCHES",
-            payload: results
-        })
+        if (res.status === "Success") {
+            const results = res.matchDisplays.map(matchDisplay => ({
+                id: matchDisplay.id,
+                songName1: matchDisplay.songName1,
+                songName2: matchDisplay.songName2
+            }))
+            dispatch({
+                type: GET_COMPLETE_MATCHES,
+                payload: results
+            })
+        } else {
+            console.log(res.errorMessage)
+        }
     })
     .catch(err => console.log(err))
 }
 
-/**
- * Gets a list of all incomplete matches
- */
-const incompleteMatches = () => dispatch => {
-    fetch(`${MATCH_ENDPOINT}/incomplete/${localStorage.getItem("uid")}`, {
-        method: "GET",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json"
-        }
-    }).then(res => res.json())
+const getIncompleteMatches = () => dispatch => {
+    REQUEST.method = "GET"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    delete REQUEST.body
+    fetch(`${MATCH_ENDPOINT}/incomplete`, REQUEST)
+    .then(res => res.json())
     .then(res => {
-        const results = res.map(match => ({
-            matchID: match.mid,
-            song1: match.sname1,
-            song2: match.sname2
-        }))
-        dispatch({
-            type: "INCOMPLETE_MATCHES",
-            payload: results
-        })
-    })
-    .catch(err => {console.log("yup"); console.log(err)})
-}
-
-/**
- * Adds a new match given a song id.
- * @param {*} song 
- */
-const addNewMatch = (song) => dispatch => {
-    fetch(`${MATCH_ENDPOINT}/create/${localStorage.getItem("uid")}?spotifyUri1=${song.id}`, {
-            method: "POST",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(dispatch({ type: "ADD_NEW_MATCH" }))
-        .catch(err => console.log(err))
-}
-
-/**
- * Adds to an exisitng match given a song id.
- * @param {*} req 
- */
-const addToExistingMatch = (req) => dispatch => {
-    fetch(`${MATCH_ENDPOINT}/addsong/${localStorage.getItem("uid")}/${req.matchID}?spotifyUri2=${req.songID}`, {
-            method: "POST",
-            crossDomain: true,
-            headers: {
-                "Content-Type": "application/json"
-            }
-        }).then(dispatch({ type: "ADD_TO_EXISTING_MATCH" }))
-        .catch(err => console.log(err))
-}
-
-/**
- * Deletes a match.
- * @param {*} matchID 
- */
-const deleteMatch = (matchID) => dispatch => {
-    fetch(`${MATCH_ENDPOINT}/delete/${matchID}/${localStorage.getItem("uid")}`, {
-        method: "DELETE",
-        crossDomain: true,
-        headers: {
-            "Content-Type": "application/json"
+        if (res.status === "Success") {
+            const results = res.matchDisplays.map(matchDisplay => ({
+                id: matchDisplay.id,
+                songName1: matchDisplay.songName1,
+                songName2: matchDisplay.songName2
+            }))
+            dispatch({
+                type: GET_INCOMPLETE_MATCHES,
+                payload: results
+            })
+        } else {
+            console.log(res.errorMessage)
         }
-    }).then(dispatch({ type: "DELETE_MATCH"}))
+    })
     .catch(err => console.log(err))
 }
 
-export { completeMatches, incompleteMatches, addNewMatch, addToExistingMatch, deleteMatch };
+ const getAllMatchesBySongName = (query) => dispatch => {
+    REQUEST.method = "GET"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    delete REQUEST.body
+    fetch(`${MATCH_ENDPOINT}/search?songName=${query.songName}`, REQUEST)
+    .then(res => res.json())
+    .then(res => {
+        if (res.status === "Success") {
+            const results = res.matchDisplays.map(matchDisplay => ({
+                id: matchDisplay.id,
+                songName1: matchDisplay.songName1,
+                songName2: matchDisplay.songName2
+            }))
+            dispatch({
+                type: GET_ALL_MATCHES_BY_SONG_NAME,
+                payload: results
+            })
+        } else {
+            console.log(res.errorMessage)
+        }
+    })
+    .catch(err => {console.log(err)})
+}
+
+const createMatch = (song) => dispatch => {
+    REQUEST.method = "POST"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    fetch(`${MATCH_ENDPOINT}/create/?songId1=${song.id}`, REQUEST)
+    .then(res => res.json())
+    .then(res => res.status === "Success" ? dispatch({ type: CREATE_MATCH }) : console.log(res.errorMessage))
+    .catch(err => console.log(err))
+}
+
+const pairMatch = (req) => dispatch => {
+    REQUEST.method = "POST"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    fetch(`${MATCH_ENDPOINT}/pair/${req.matchId}?songId2=${req.songId}`, REQUEST)
+    .then(res => res.json())
+    .then(res => res.status === "Success" ? dispatch({ type: PAIR_MATCH }) : console.log(res.errorMessage))
+    .catch(err => console.log(err))
+}
+
+const deleteMatch = (matchId) => dispatch => {
+    REQUEST.method = "DELETE"
+    REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem("access_token")}`
+    fetch(`${MATCH_ENDPOINT}/delete/${matchId}`, REQUEST)
+    .then(res => res.json())
+    .then(res => res.status === "Success" ? dispatch({ type: DELETE_MATCH, payload: Number(matchId) }) : console.log(res.errorMessage))
+    .catch(err => console.log(err))
+}
+
+export { getCompleteMatches, getIncompleteMatches, getAllMatchesBySongName, createMatch, pairMatch, deleteMatch };

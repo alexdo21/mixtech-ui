@@ -1,42 +1,34 @@
-/**
- * Reducer changing state of playlists, responds to actions from PlaylistActions.js
- */
+import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, CREATE_PLAYLIST, ADD_SONG_TO_PLAYLIST, DELETE_PLAYLIST } from "../actions/types"
 
-
-/**
- * State of playlists and songs in playlists.
- */
 const initialState = {
-    results: [], // playlists
-    songs: [] // songs in a given playlist
+    playlists: [],
+    playlistSongs: []
 };
 
-/**
- * Pure function, responds to corresponding action.
- */
 export const PlaylistReducer = (state=initialState, action) => {
     switch (action.type) {
-        case "ALL_PLAYLISTS":
+        case GET_ALL_PLAYLISTS:
             return {
                 ...state,
-                results: action.payload
-            };
-        case "ADD_PLAYLIST":
-            return {
-                ...state
+                playlists: action.payload
             }
-        case "ADD_TO_EXISTING_PLAYLIST":
-            return {
-                ...state
-            }
-        case "DELETE_PLAYLIST":
-            return {
-                ...state
-            }
-        case "GET_ALL_SONGS_IN_PLAYLIST":
+        case GET_ALL_SONGS_IN_PLAYLIST:
             return {
                 ...state,
-                songs: action.payload
+                playlistSongs: action.payload
+            }
+        case CREATE_PLAYLIST:
+            return {
+                ...state
+            }
+        case ADD_SONG_TO_PLAYLIST:
+            return {
+                ...state
+            }
+        case DELETE_PLAYLIST:
+            return {
+                ...state,
+                playlists: state.playlists.filter(playlist => playlist.id !== action.payload )
             }
         default:
             return {...state}

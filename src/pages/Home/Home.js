@@ -1,23 +1,28 @@
 import React from "react";
+import PropTypes from "prop-types"
+import { connect } from "react-redux"
 import { Sidebar } from "../../components"
 import { Matches, Playlists, Search, AdvancedSearch } from "../"
-
+import { getUserInfo } from "../../actions";
 import { Routes, Route } from "react-router-dom"
+import { Navigate } from "react-router"
 import "./Home.css"
 
+function Home({getUserInfo, isAuthenticated}) {
+    React.useEffect(() => {
+        const fetchUserInfo = async () => {
+            await getUserInfo()
+        }
+        fetchUserInfo()
+    }, [getUserInfo])
 
-/**
- * The authenticated user will be redirected to this home page.
- * Defines a sidebar as the navigation bar for MixTech and defines several
- * browser routes for the user each with their corresponding
- * component and functionality.
- */
-function Home() {
+    console.log(isAuthenticated)
     return (
         <div id="home">
             <Sidebar />
             <Routes>
                 <Route exact path="/" element={<Matches />} />
+                <Route path="/matches" element={<Matches />} />
                 <Route path="/playlists" element={<Playlists />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/advancedsearch" element={<AdvancedSearch />} />
@@ -26,4 +31,13 @@ function Home() {
     )
 }
 
-export { Home };
+Home.propTypes = {
+    getUserInfo: PropTypes.func.isRequired,
+    isAuthenticated: PropTypes.bool.isRequired
+}
+
+const mapStateToProps = state => ({
+    isAuthenticated: state.userReducer.isAuthenticated
+})
+
+export const ConnectedHome = connect(mapStateToProps, { getUserInfo })(Home);

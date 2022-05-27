@@ -1,9 +1,10 @@
 import React from "react"
-import { BrowserRouter, Routes, Route} from "react-router-dom"
+import { BrowserRouter, Routes, Route } from "react-router-dom"
 import { connect } from "react-redux";
 
 import "./App.css"
-import { Front, Home, Login, Register } from "./pages"
+import { Front, Home } from "./pages"
+import { PrivateRoute, OAuth2RedirectHandler } from "./components"
 
 /**
  * Starting point of MixTech. Defines browser routes through React Router.
@@ -14,10 +15,11 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route exact path="/" element={<Front />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/home/*" element={<Home />} />
+        <Route exact path="/login" element={<Front />} />
+        <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
+        <Route path="/" element={<PrivateRoute />}>
+          <Route path="/*" element={<Home />} />
+        </Route>
       </Routes>
     </BrowserRouter>
   );

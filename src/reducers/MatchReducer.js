@@ -1,43 +1,41 @@
-/**
- * Reducer changing state of matches, responds to actions from MatchActions.js
- */
+import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, GET_ALL_MATCHES_BY_SONG_NAME, CREATE_MATCH, PAIR_MATCH, DELETE_MATCH } from "../actions/types"
 
-
-/**
- * State of complete and incomplete matches.
- */
 const initialState = {
-    completeResults: [],
-    incompleteResults: []
+    completeMatches: [],
+    incompleteMatches: [],
+    searchMatches: []
 };
 
-
-/**
- * Pure function, responds to corresponding action.
- */
 export const MatchReducer = (state=initialState, action) => {
     switch (action.type) {
-        case "COMPLETE_MATCHES":
+        case GET_COMPLETE_MATCHES:
             return {
                 ...state,
-                completeResults: action.payload,
-            };
-        case "INCOMPLETE_MATCHES":
+                completeMatches: action.payload,
+            }
+        case GET_INCOMPLETE_MATCHES:
             return {
                 ...state,
-                incompleteResults: action.payload
-            };
-        case "ADD_NEW_MATCH":
+                incompleteMatches: action.payload
+            }
+        case GET_ALL_MATCHES_BY_SONG_NAME:
+            return {
+                ...state,
+                searchMatches: action.payload
+            }
+        case CREATE_MATCH:
             return {
                 ...state
             }
-        case "ADD_TO_EXISTING_MATCH":
+        case PAIR_MATCH:
             return {
                 ...state
             }
-        case "DELETE_MATCH":
+        case DELETE_MATCH:
             return {
-                ...state
+                ...state,
+                completeMatches: state.completeMatches.filter(match => match.id !== action.payload),
+                incompleteMatches: state.incompleteMatches.filter(match => match.id !== action.payload),
             }
         default:
             return {...state}

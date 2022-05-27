@@ -2,13 +2,12 @@ import React from "react";
 import { ModalWrapper } from "../../components"
 import PropTypes from "prop-types"
 import { connect } from "react-redux" 
-import { advancedResults, clearResults } from "../../actions"
+import { getSongsByAudioFeatures, clearSearchResults } from "../../actions"
 import InputRange from "react-input-range"
 import "react-input-range/lib/css/index.css"
 import "./AdvancedSearch.css"
 
-
-function AdvancedSearch({clearResults, advancedResults, results}) {
+function AdvancedSearch({clearSearchResults, getSongsByAudioFeatures, searchResults}) {
     const [key, setKey] = React.useState(0)
     const [mode, setMode] = React.useState(1)
     const [danceability, setDanceability] = React.useState({min: 0.0, max: 1.0})
@@ -26,15 +25,15 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
 
     React.useEffect(() => {
         return () => {
-            clearResults()
+            clearSearchResults()
         }
-    }, [clearResults])
+    }, [clearSearchResults])
 
     const handleSubmit = (event) => {
         event.preventDefault()
         const query = {
-            skey: key,
-            smode: mode,
+            key: key,
+            mode: mode,
             danceability0: danceability.min, danceability1: danceability.max,
             energy0: energy.min, energy1: energy.max,
             loudness0: loudness.min, loudness1: loudness.max,
@@ -44,9 +43,8 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
             liveness0: liveness.min, liveness1: liveness.max,
             valence0: valence.min, valence1: valence.max,
             tempo0: tempo.min, tempo1: tempo.max,
-            duration_ms0: duration_ms.min, duration_ms1: duration_ms.max
         }
-        advancedResults(query)
+        getSongsByAudioFeatures(query)
     }
 
     const onOpenModal = (event) => {
@@ -92,7 +90,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={1.0}
-                            step={0.01}
+                            step={0.1}
                             value={danceability}
                             onChange={value => setDanceability(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -102,7 +100,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={1.0}
-                            step={0.01}
+                            step={0.1}
                             value={energy}
                             onChange={value => setEnergy(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -112,7 +110,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={-60.0}
                             maxValue={0.0}
-                            step={0.01}
+                            step={1.0}
                             value={loudness}
                             onChange={value => setLoudness(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -124,7 +122,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={1.0}
-                            step={0.01}
+                            step={0.1}
                             value={speechiness}
                             onChange={value => setSpeechiness(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -134,7 +132,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={1.0}
-                            step={0.01}
+                            step={0.1}
                             value={acousticness}
                             onChange={value => setAcousticness(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -144,7 +142,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={1.0}
-                            step={0.01}
+                            step={0.1}
                             value={instrumentalness}
                             onChange={value => setInstrumentalness(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -166,7 +164,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={1.0}
-                            step={0.01}
+                            step={0.1}
                             value={valence}
                             onChange={value => setValence(value)}
                             onChangeComplete={value => console.log(value)} />
@@ -176,13 +174,13 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                             <InputRange
                             minValue={0.0}
                             maxValue={250.0}
-                            step={0.01}
+                            step={1}
                             value={tempo}
                             onChange={value => setTempo(value)}
                             onChangeComplete={value => console.log(value)} />
                         </div>
                     </div>
-                    <button className="btn btn-primary">Submit</button>
+                    <button type="submit" className="btn btn-primary">Submit</button>
                 </form>
             </div>
             <div className="container" id="results">
@@ -196,7 +194,7 @@ function AdvancedSearch({clearResults, advancedResults, results}) {
                         </tr>
                     </thead>
                     <tbody>
-                    {results.map((song, i) =>
+                    {searchResults.map((song, i) =>
                         <tr key={i}>
                             <td><button className="btn btn-light btn-lg" selected={song} onClick={onOpenModal}>{song.name}</button></td>
                             <td>{whichKey(song.key)}</td>
@@ -234,16 +232,15 @@ const whichKey = (value) => {
     }
 }
 
-
 AdvancedSearch.propTypes = {
-    advancedResults: PropTypes.func.isRequired,
-    clearResults: PropTypes.func.isRequired,
-    results: PropTypes.array
+    getSongsByAudioFeatures: PropTypes.func.isRequired,
+    clearSearchResults: PropTypes.func.isRequired,
+    searchResults: PropTypes.array
 }
 
 const mapStateToProps = state => ({
-    results: state.SearchResults.results
+    searchResults: state.searchReducer.searchResults
 })
 
-const ConnectedAdvancedSearch = connect(mapStateToProps, { advancedResults, clearResults })(AdvancedSearch)
+const ConnectedAdvancedSearch = connect(mapStateToProps, { getSongsByAudioFeatures, clearSearchResults })(AdvancedSearch)
 export { ConnectedAdvancedSearch }

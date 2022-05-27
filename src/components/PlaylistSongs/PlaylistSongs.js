@@ -4,7 +4,7 @@ import { connect } from "react-redux"
 import { getAllSongsInPlaylist } from "../../actions"
 import PropTypes from "prop-types"
 
-function PlaylistSongs({playlist, open, onClose, songs}) {
+function PlaylistSongs({playlist, open, onClose, playlistSongs}) {
     return (
         playlist === null ?
         <div></div> :
@@ -18,7 +18,7 @@ function PlaylistSongs({playlist, open, onClose, songs}) {
                     </tr>
                 </thead>
                 <tbody>
-                    {songs.map((song, i) => 
+                    {playlistSongs.map((song, i) => 
                         <tr key={i}>
                             <td>{i}</td>
                             <td>{song.name}</td>
@@ -32,11 +32,11 @@ function PlaylistSongs({playlist, open, onClose, songs}) {
 
 PlaylistSongs.propTypes = {
     getAllSongsInPlaylist: PropTypes.func.isRequired,
-    songs: PropTypes.array
+    playlistSongs: PropTypes.array
 }
 
 const mapStateToProps = state => ({
-    songs: state.playlists.songs
+    songs: state.playlistReducer.playlistSongs
 })
 
 export const ConnectedPlaylistSongs = connect(mapStateToProps, { getAllSongsInPlaylist })(PlaylistSongs);

@@ -1,21 +1,24 @@
 import React from "react";
 import PropTypes from "prop-types"
 import { connect } from "react-redux"
-import { completeMatches, incompleteMatches, deleteMatch } from "../../actions"
+import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../actions"
+import { useSelector, useDispatch } from "react-redux";
 import "./Matches.css"
 
-function Matches({completeMatches, incompleteMatches, deleteMatch, completeResults, incompleteResults}) {
+function Matches({getCompleteMatches, getIncompleteMatches, deleteMatch, completeMatches, incompleteMatches}) {
+    // const completeMatches = useSelector(state => state.matchReducer.completeMatches)
+    // const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
+    // const dispatch = useDispatch()
     React.useEffect(() => {
         const fetchMatches = async () => {
-            await completeMatches()
-            await incompleteMatches()
+            await getCompleteMatches()
+            await getIncompleteMatches()
         }
         fetchMatches()
-    }, [completeMatches, incompleteMatches])
+    }, [getCompleteMatches, getIncompleteMatches])
 
     const handleDelete = async (event) => {
         await deleteMatch(event.target.value)
-        window.location.reload()
     }
 
     return (
@@ -34,11 +37,11 @@ function Matches({completeMatches, incompleteMatches, deleteMatch, completeResul
                         </tr>
                     </thead>
                     <tbody>
-                        {completeResults.map((match, i) => 
+                        {completeMatches.map((match, i) => 
                             <tr key={i}>
-                                <td>{match.song1}</td>
-                                <td>{match.song2}</td>
-                                <td><button className="btn btn-outline-danger btn-sm" value={match.matchID} onClick={handleDelete}>X</button></td>
+                                <td>{match.songName1}</td>
+                                <td>{match.songName2}</td>
+                                <td><button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button></td>
                             </tr>  
                         )}
                     </tbody>
@@ -55,11 +58,11 @@ function Matches({completeMatches, incompleteMatches, deleteMatch, completeResul
                         </tr>
                     </thead>
                     <tbody>
-                        {incompleteResults.map((match, i) => 
+                        {incompleteMatches.map((match, i) => 
                             <tr key={i}>
-                                <td>{match.song1}</td>
+                                <td>{match.songName1}</td>
                                 <td>...</td>
-                                <td><button className="btn btn-outline-danger btn-sm" value={match.matchID} onClick={handleDelete}>X</button></td>
+                                <td><button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button></td>
                             </tr>  
                         )}
                     </tbody>
@@ -70,16 +73,16 @@ function Matches({completeMatches, incompleteMatches, deleteMatch, completeResul
 }
 
 Matches.propTypes = {
-    completeMatches: PropTypes.func.isRequired,
-    incompleteMatches: PropTypes.func.isRequired,
+    getCompleteMatches: PropTypes.func.isRequired,
+    getIncompleteMatches: PropTypes.func.isRequired,
     deleteMatch: PropTypes.func.isRequired,
-    completeResults: PropTypes.array,
-    incompleteResults: PropTypes.array
+    completeMatches: PropTypes.array,
+    incompleteMatches: PropTypes.array
 };
 
 const mapStateToProps = state => ({
-    completeResults: state.matches.completeResults,
-    incompleteResults: state.matches.incompleteResults
+    completeMatches: state.matchReducer.completeMatches,
+    incompleteMatches: state.matchReducer.incompleteMatches
 })
 
-export const ConnectedMatches = connect(mapStateToProps, { completeMatches, incompleteMatches, deleteMatch })(Matches)
+export const ConnectedMatches = connect(mapStateToProps, { getCompleteMatches, getIncompleteMatches, deleteMatch })(Matches)

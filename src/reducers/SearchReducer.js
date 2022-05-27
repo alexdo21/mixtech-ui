@@ -1,42 +1,25 @@
-/**
- * Reducer changing state of search results, responds to actions from SearchActions.js
- */
+import { GET_SONGS_BY_SONG_NAME, GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "../actions/types"
 
 const initialState = {
-  results: [], // current results basic/advanced
-  matches: [] // matches from basic search
+  searchResults: []
 }
 
-/**
- * Pure function, responds to corresponding action.
- */
 export const SearchReducer = (state=initialState, action) => {
     switch (action.type) {
-      case "BASIC_SEARCH":
+      case GET_SONGS_BY_SONG_NAME:
         return {
           ...state,
-          results: action.payload
+          searchResults: action.payload
         }
-      case "ADVANCED_SEARCH":
+      case GET_SONGS_BY_AUDIO_FEATURES:
         return {
           ...state,
-          results: action.payload
+          searchResults: action.payload
         }
-      case "MATCH_SEARCH":
+      case CLEAR_SEARCH_RESULTS:
         return {
           ...state,
-          matches: action.payload
-        }
-      case "PROCESSING":
-        return {
-          ...state,
-          message: "Loading..."
-        }
-      case "CLEAR":
-        return {
-          ...state,
-          results: [],
-          matches: []
+          searchResults: []
         }
       default:
         return {...state}

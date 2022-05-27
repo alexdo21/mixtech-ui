@@ -1,8 +1,8 @@
 import { combineReducers } from "redux";
-import { SearchReducer } from "./SearchReducer";
-import { UserAuthReducer } from "./UserAuthReducer";
-import { PlaylistReducer } from "./PlaylistReducer"
 import { MatchReducer } from "./MatchReducer"
+import { PlaylistReducer } from "./PlaylistReducer"
+import { SearchReducer } from "./SearchReducer";
+import { UserReducer } from "./UserReducer";
 
 
 /**
@@ -10,9 +10,9 @@ import { MatchReducer } from "./MatchReducer"
  * redux store.
  */
 export const rootReducer = combineReducers({
- SearchResults: SearchReducer,
- userAuth: UserAuthReducer,
- playlists: PlaylistReducer,
- matches: MatchReducer
+    matchReducer: MatchReducer,
+    playlistReducer: PlaylistReducer,
+    searchReducer: SearchReducer,
+    userReducer: UserReducer,
 });
 

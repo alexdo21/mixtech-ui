@@ -1,43 +1,43 @@
 import React from "react";
 import { ModalWrapper } from "../../components"
 import PropTypes from "prop-types"
-import { basicResults, clearResults, basicMatches } from "../../actions"
+import { getSongsBySongName, clearSearchResults, getAllMatchesBySongName } from "../../actions"
 import { connect } from "react-redux"
 import "./Search.css"
 
 
-function Search({clearResults, basicResults, basicMatches, results, matches}) {
-    const [sname, setSname] = React.useState("")
+function Search({clearSearchResults, getSongsBySongName, getAllMatchesBySongName, searchResults, searchMatches}) {
+    const [songName, setSongName] = React.useState("")
     const [modalOpen, setModalOpen] = React.useState(false)
     const [selected, setSelected] = React.useState(null)
 
     React.useEffect(() => {
         return () => {
-            clearResults()
+            clearSearchResults()
         }
-    }, [clearResults])
+    }, [clearSearchResults])
 
-    const handleSnameChange = (event) => setSname(event.target.value)
+    const handleSongNameChange = (event) => setSongName(event.target.value)
     const handleSubmit = async (event) => {
         event.preventDefault()
-        const query = {sname: sname}
-        await basicResults(query)
-        await basicMatches(query)
+        const query = {songName: songName}
+        await getSongsBySongName(query)
+        await getAllMatchesBySongName(query)
     }
     const onOpenModal = (event) => {
         setSelected(event.target.selected)
         setModalOpen(true)
     }
     const onCloseModal = () => setModalOpen(false)
-
+    
     return (
         <div id="searchContent">
             <div className="container" id="form">
                 <form onSubmit={handleSubmit}>
                     <div className="form-group"> 
                         <label htmlFor="search"><h1>Search</h1></label>
-                        <input type="text" className="form-control" name="sname" placeholder="Enter song name"
-                        onChange={handleSnameChange}></input>
+                        <input type="text" className="form-control" name="songName" placeholder="Enter song name"
+                        onChange={handleSongNameChange}></input>
                     </div>
                     <button type="submit" className="btn btn-primary">Search</button>
                 </form>
@@ -53,7 +53,7 @@ function Search({clearResults, basicResults, basicMatches, results, matches}) {
                         </tr>
                     </thead>
                     <tbody>
-                        {results.map((song, i) =>
+                        {searchResults.map((song, i) =>
                             <tr key={i}>
                                 <td><button className="btn btn-light btn-lg" selected={song} onClick={onOpenModal}>{song.name}</button></td>
                                 <td>{whichKey(song.key)}</td>
@@ -74,10 +74,10 @@ function Search({clearResults, basicResults, basicMatches, results, matches}) {
                         </tr>
                     </thead>
                     <tbody>
-                        {matches.map((match, i) => 
+                        {searchMatches.map((match, i) => 
                             <tr key={i}>
-                                <td>{match.song1}</td>
-                                <td>{match.song2}</td>
+                                <td>{match.songName1}</td>
+                                <td>{match.songName2}</td>
                             </tr>  
                         )}
                     </tbody>
@@ -111,16 +111,16 @@ const whichKey = (value) => {
 }
 
 Search.propTypes = {
-    basicResults: PropTypes.func.isRequired,
-    clearResults: PropTypes.func.isRequired,
-    basicMatches: PropTypes.func.isRequired,
-    results: PropTypes.array
+    getSongsBySongName: PropTypes.func.isRequired,
+    clearSearchResults: PropTypes.func.isRequired,
+    getAllMatchesBySongName: PropTypes.func.isRequired,
+    searchResults: PropTypes.array
 }
 
 const mapStateToProps = state => ({
-    results: state.SearchResults.results,
-    matches: state.SearchResults.matches
+    searchResults: state.searchReducer.searchResults,
+    searchMatches: state.matchReducer.searchMatches
 })
 
 
-export const ConnectedSearch = connect(mapStateToProps, { basicResults, clearResults, basicMatches })(Search);
+export const ConnectedSearch = connect(mapStateToProps, { getSongsBySongName, clearSearchResults, getAllMatchesBySongName })(Search);
