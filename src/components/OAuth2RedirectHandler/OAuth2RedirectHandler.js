@@ -1,13 +1,13 @@
 import React from 'react'
 import { Navigate, useLocation } from 'react-router';
 import { useSelector, useDispatch } from "react-redux"
-import { LOGIN_SUCCESS, LOGIN_FAILURE } from "../../actions/types"
-
+import { LOGIN_SUCCESS, LOGIN_FAILURE } from "../../reducers/types"
 
 function OAuth2RedirectHandler() {
     const location = useLocation()
     const isAuthenticated = useSelector(state => state.userReducer.isAuthenticated)
     const dispatch = useDispatch()
+    
     React.useEffect(() => {
         const getUrlParameter = (name) => {
             name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');

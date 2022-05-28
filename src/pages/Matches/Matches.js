@@ -1,24 +1,28 @@
 import React from "react";
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../actions"
+import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, DELETE_MATCH } from "../../reducers/types"
+import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../services"
 import { useSelector, useDispatch } from "react-redux";
 import "./Matches.css"
 
-function Matches({getCompleteMatches, getIncompleteMatches, deleteMatch, completeMatches, incompleteMatches}) {
-    // const completeMatches = useSelector(state => state.matchReducer.completeMatches)
-    // const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
-    // const dispatch = useDispatch()
-    React.useEffect(() => {
-        const fetchMatches = async () => {
-            await getCompleteMatches()
-            await getIncompleteMatches()
-        }
-        fetchMatches()
-    }, [getCompleteMatches, getIncompleteMatches])
+function Matches() {
+    const completeMatches = useSelector(state => state.matchReducer.completeMatches)
+    const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
+    const dispatch = useDispatch()
 
-    const handleDelete = async (event) => {
-        await deleteMatch(event.target.value)
+    React.useEffect(() => {
+        getCompleteMatches()
+        .then(completeMatches => dispatch({ type: GET_COMPLETE_MATCHES, payload: completeMatches }))
+        .catch(err => console.log(err))
+        getIncompleteMatches()
+        .then(incompleteMatches => dispatch({ type: GET_INCOMPLETE_MATCHES, payload: incompleteMatches }))
+        .catch(err => console.log(err))
+    }, [dispatch])
+
+    const handleDelete = (event) => {
+        const matchId = event.target.value
+        deleteMatch(matchId)
+        .then(() => dispatch({ type: DELETE_MATCH, payload: Number(matchId) }))
+        .catch(err => console.log(err))
     }
 
     return (
@@ -72,17 +76,4 @@ function Matches({getCompleteMatches, getIncompleteMatches, deleteMatch, complet
     );
 }
 
-Matches.propTypes = {
-    getCompleteMatches: PropTypes.func.isRequired,
-    getIncompleteMatches: PropTypes.func.isRequired,
-    deleteMatch: PropTypes.func.isRequired,
-    completeMatches: PropTypes.array,
-    incompleteMatches: PropTypes.array
-};
-
-const mapStateToProps = state => ({
-    completeMatches: state.matchReducer.completeMatches,
-    incompleteMatches: state.matchReducer.incompleteMatches
-})
-
-export const ConnectedMatches = connect(mapStateToProps, { getCompleteMatches, getIncompleteMatches, deleteMatch })(Matches)
+export { Matches };

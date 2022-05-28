@@ -1,22 +1,23 @@
 import React from "react";
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
 import { Sidebar } from "../../components"
 import { Matches, Playlists, Search, AdvancedSearch } from "../"
-import { getUserInfo } from "../../actions";
+import { getUserInfo } from "../../services";
+import { GET_USER_INFO } from "../../reducers/types"
+import { useSelector, useDispatch } from "react-redux";
 import { Routes, Route } from "react-router-dom"
 import { Navigate } from "react-router"
 import "./Home.css"
 
-function Home({getUserInfo, isAuthenticated}) {
-    React.useEffect(() => {
-        const fetchUserInfo = async () => {
-            await getUserInfo()
-        }
-        fetchUserInfo()
-    }, [getUserInfo])
+function Home() {
+    const isAuthenticated = useSelector(state => state.userReducer.isAuthenticated)
+    const dispatch = useDispatch()
 
-    console.log(isAuthenticated)
+    React.useEffect(() => {
+        getUserInfo()
+        .then(user => dispatch({ type: GET_USER_INFO, payload: user }))
+        .catch(err => console.log(err))
+    }, [dispatch])
+
     return (
         <div id="home">
             <Sidebar />
@@ -31,13 +32,4 @@ function Home({getUserInfo, isAuthenticated}) {
     )
 }
 
-Home.propTypes = {
-    getUserInfo: PropTypes.func.isRequired,
-    isAuthenticated: PropTypes.bool.isRequired
-}
-
-const mapStateToProps = state => ({
-    isAuthenticated: state.userReducer.isAuthenticated
-})
-
-export const ConnectedHome = connect(mapStateToProps, { getUserInfo })(Home);
+export { Home };

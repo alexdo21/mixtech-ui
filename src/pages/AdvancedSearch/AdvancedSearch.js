@@ -1,13 +1,13 @@
 import React from "react";
 import { ModalWrapper } from "../../components"
-import PropTypes from "prop-types"
-import { connect } from "react-redux" 
-import { getSongsByAudioFeatures, clearSearchResults } from "../../actions"
+import { getSongsByAudioFeatures, whichKey } from "../../services"
+import { GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "../../reducers/types"
+import { useSelector, useDispatch } from "react-redux";
 import InputRange from "react-input-range"
 import "react-input-range/lib/css/index.css"
 import "./AdvancedSearch.css"
 
-function AdvancedSearch({clearSearchResults, getSongsByAudioFeatures, searchResults}) {
+function AdvancedSearch() {
     const [key, setKey] = React.useState(0)
     const [mode, setMode] = React.useState(1)
     const [danceability, setDanceability] = React.useState({min: 0.0, max: 1.0})
@@ -19,19 +19,20 @@ function AdvancedSearch({clearSearchResults, getSongsByAudioFeatures, searchResu
     const [liveness, setLiveness] = React.useState({min: 0.0, max: 1.0})
     const [valence, setValence] = React.useState({min: 0.0, max: 1.0})
     const [tempo, setTempo] = React.useState({min: 0.0, max: 250.0})
-    const [duration_ms] = React.useState({min: 1, max: 5000})
-    const [modalOpen, setModalOpen] = React.useState(false)
-    const [selected, setSelected] = React.useState(null)
+    const [durationMs] = React.useState({min: 1, max: 5000})
+    const [isSongDetailsModalOpen, setIsSongDetailsModalOpen] = React.useState(false)
+    const [selectedSong, setSelectedSong] = React.useState(null)
+
+    const searchResults = useSelector(state => state.searchReducer.searchResults)
+    const dispatch = useDispatch()
 
     React.useEffect(() => {
-        return () => {
-            clearSearchResults()
-        }
-    }, [clearSearchResults])
+        return () => dispatch({ type: CLEAR_SEARCH_RESULTS })
+    }, [dispatch])
 
     const handleSubmit = (event) => {
         event.preventDefault()
-        const query = {
+        const advancedSearchRequest = {
             key: key,
             mode: mode,
             danceability0: danceability.min, danceability1: danceability.max,
@@ -44,14 +45,14 @@ function AdvancedSearch({clearSearchResults, getSongsByAudioFeatures, searchResu
             valence0: valence.min, valence1: valence.max,
             tempo0: tempo.min, tempo1: tempo.max,
         }
-        getSongsByAudioFeatures(query)
+        getSongsByAudioFeatures(advancedSearchRequest)
+        .then(searchResults => dispatch({ type: GET_SONGS_BY_AUDIO_FEATURES, payload: searchResults }))
+        .catch(err => console.log(err))
     }
-
-    const onOpenModal = (event) => {
-        setSelected(event.target.selected)
-        setModalOpen(true)
+    const handleSelectedSongToOpen = (event) => {
+        setSelectedSong(event.target.selected)
+        setIsSongDetailsModalOpen(true)
     }
-    const onCloseModal = () => setModalOpen(false)
 
     return (
         <div id="asearchContent">
@@ -196,7 +197,7 @@ function AdvancedSearch({clearSearchResults, getSongsByAudioFeatures, searchResu
                     <tbody>
                     {searchResults.map((song, i) =>
                         <tr key={i}>
-                            <td><button className="btn btn-light btn-lg" selected={song} onClick={onOpenModal}>{song.name}</button></td>
+                            <td><button className="btn btn-light btn-lg" selected={song} onClick={handleSelectedSongToOpen}>{song.name}</button></td>
                             <td>{whichKey(song.key)}</td>
                             <td>{song.tempo}</td>
                             <td>{song.popularity}</td>
@@ -205,42 +206,9 @@ function AdvancedSearch({clearSearchResults, getSongsByAudioFeatures, searchResu
                     </tbody>
                 </table>
             </div>
-            <ModalWrapper open={modalOpen} onClose={onCloseModal} song={selected}/>
+            <ModalWrapper open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong}/>
         </div>
     );
 }
 
-/**
- * Helper function for readability of keys.
- * @param value - key value
- */
-const whichKey = (value) => {
-    switch(value) {
-        case 0: return "C"
-        case 1: return "C#/Db"
-        case 2: return "D"
-        case 3: return "D#/Eb"
-        case 4: return "E"
-        case 5: return "F"
-        case 6: return "F#/Gb"
-        case 7: return "G"
-        case 8: return "G#/Ab"
-        case 9: return "A"
-        case 10: return "A#/Bb"
-        case 11: return "B"
-        default: return "..."
-    }
-}
-
-AdvancedSearch.propTypes = {
-    getSongsByAudioFeatures: PropTypes.func.isRequired,
-    clearSearchResults: PropTypes.func.isRequired,
-    searchResults: PropTypes.array
-}
-
-const mapStateToProps = state => ({
-    searchResults: state.searchReducer.searchResults
-})
-
-const ConnectedAdvancedSearch = connect(mapStateToProps, { getSongsByAudioFeatures, clearSearchResults })(AdvancedSearch)
-export { ConnectedAdvancedSearch }
+export { AdvancedSearch }

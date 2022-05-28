@@ -1,17 +1,25 @@
 import React from "react";
 import { Link } from "react-router-dom"
-import PropTypes from "prop-types"
-import { logout } from "../../actions"
-import { connect } from "react-redux"
+import { logout } from "../../services"
+import { LOGOUT } from "../../reducers/types"
+import { useSelector, useDispatch } from "react-redux";
 import "./Sidebar.css"
 
 
-function Sidebar({logout, user}) {
+function Sidebar() {
+    const user = useSelector(state => state.userReducer.user)
+    const dispatch = useDispatch()
+
+    const handleLogout = () => {
+        logout()
+        .then(() => dispatch({ type: LOGOUT }))
+    }
+
     return (
         <nav className="navbar" id="sidebar">
             <div className="navbar-brand sidebar-header">
                 <Link to={"/matches"}><h1>MixTech</h1></Link>
-                <h5>Logged in as: {user !== null ? user.name : ""}</h5>
+                <h5>{user !== null ? user.name : ""}</h5>
             </div>
             <ul className="navbar-nav">
                 <li className="nav-item">
@@ -27,17 +35,9 @@ function Sidebar({logout, user}) {
                     <Link to={"/advancedsearch"}><h4>Advanced Search</h4></Link>
                 </li>
             </ul>
-            <button onClick={logout} id="logout" className="btn btn-secondary justify-content-end">Logout</button>
+            <button onClick={handleLogout} id="logout" className="btn btn-secondary justify-content-end">Logout</button>
         </nav>
     )
 }
 
-Sidebar.propTypes = {
-    logout: PropTypes.func.isRequired
-}
-
-const mapStateToProps = state => ({
-    user: state.userReducer.user
-})
-
-export const ConnectedSidebar = connect(mapStateToProps, { logout })(Sidebar);
+export { Sidebar };

@@ -1,8 +1,8 @@
 import { Front } from "./Front/Front";
-import { ConnectedHome } from "./Home/Home";
-import { ConnectedMatches } from "./Matches/Matches"
-import { ConnectedPlaylists } from "./Playlists/Playlists"
-import { ConnectedSearch } from "./Search/Search"
-import { ConnectedAdvancedSearch } from "./AdvancedSearch/AdvancedSearch"
+import { Home } from "./Home/Home";
+import { Matches } from "./Matches/Matches"
+import { Playlists } from "./Playlists/Playlists"
+import { Search } from "./Search/Search"
+import { AdvancedSearch } from "./AdvancedSearch/AdvancedSearch"
 
-export { Front, ConnectedHome as Home, ConnectedMatches as Matches, ConnectedPlaylists as Playlists, ConnectedSearch as Search, ConnectedAdvancedSearch as AdvancedSearch }
+export { Front, Home, Matches, Playlists, Search, AdvancedSearch }

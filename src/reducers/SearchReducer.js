@@ -1,4 +1,4 @@
-import { GET_SONGS_BY_SONG_NAME, GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "../actions/types"
+import { GET_SONGS_BY_SONG_NAME, GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "./types"
 
 const initialState = {
   searchResults: []

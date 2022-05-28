@@ -1,43 +1,46 @@
 import React from "react";
 import { ModalWrapper } from "../../components"
-import PropTypes from "prop-types"
-import { getSongsBySongName, clearSearchResults, getAllMatchesBySongName } from "../../actions"
-import { connect } from "react-redux"
+import { getSongsBySongName, getAllMatchesBySongName, whichKey } from "../../services"
+import { GET_SONGS_BY_SONG_NAME, CLEAR_SEARCH_RESULTS, GET_ALL_MATCHES_BY_SONG_NAME } from "../../reducers/types"
+import { useSelector, useDispatch } from "react-redux";
 import "./Search.css"
 
 
-function Search({clearSearchResults, getSongsBySongName, getAllMatchesBySongName, searchResults, searchMatches}) {
+function Search() {
     const [songName, setSongName] = React.useState("")
-    const [modalOpen, setModalOpen] = React.useState(false)
-    const [selected, setSelected] = React.useState(null)
+    const [isSongDetailsModalOpen, setIsSongDetailsModalOpen] = React.useState(false)
+    const [selectedSong, setSelectedSong] = React.useState(null)
+
+    const searchResults = useSelector(state => state.searchReducer.searchResults)
+    const searchMatches = useSelector(state => state.matchReducer.searchMatches)
+    const dispatch = useDispatch()
 
     React.useEffect(() => {
-        return () => {
-            clearSearchResults()
-        }
-    }, [clearSearchResults])
+        return () => dispatch({ type: CLEAR_SEARCH_RESULTS })
+    }, [dispatch])
 
-    const handleSongNameChange = (event) => setSongName(event.target.value)
-    const handleSubmit = async (event) => {
+    const handleSearchSong = (event) => {
         event.preventDefault()
-        const query = {songName: songName}
-        await getSongsBySongName(query)
-        await getAllMatchesBySongName(query)
+        getSongsBySongName(songName)
+        .then(searchResults => dispatch({ type: GET_SONGS_BY_SONG_NAME, payload: searchResults }))
+        .catch(err => console.log(err))
+        getAllMatchesBySongName(songName)
+        .then(searchMatches => dispatch({ type: GET_ALL_MATCHES_BY_SONG_NAME, payload: searchMatches }) )
+        .catch(err => console.log(err))
     }
-    const onOpenModal = (event) => {
-        setSelected(event.target.selected)
-        setModalOpen(true)
+    const handleSelectedSongToOpen = (event) => {
+        setSelectedSong(event.target.selected)
+        setIsSongDetailsModalOpen(true)
     }
-    const onCloseModal = () => setModalOpen(false)
     
     return (
         <div id="searchContent">
             <div className="container" id="form">
-                <form onSubmit={handleSubmit}>
+                <form onSubmit={handleSearchSong}>
                     <div className="form-group"> 
                         <label htmlFor="search"><h1>Search</h1></label>
                         <input type="text" className="form-control" name="songName" placeholder="Enter song name"
-                        onChange={handleSongNameChange}></input>
+                        onChange={(event) => setSongName(event.target.value)}></input>
                     </div>
                     <button type="submit" className="btn btn-primary">Search</button>
                 </form>
@@ -55,7 +58,7 @@ function Search({clearSearchResults, getSongsBySongName, getAllMatchesBySongName
                     <tbody>
                         {searchResults.map((song, i) =>
                             <tr key={i}>
-                                <td><button className="btn btn-light btn-lg" selected={song} onClick={onOpenModal}>{song.name}</button></td>
+                                <td><button className="btn btn-light btn-lg" selected={song} onClick={handleSelectedSongToOpen}>{song.name}</button></td>
                                 <td>{whichKey(song.key)}</td>
                                 <td>{song.tempo}</td>
                                 <td>{song.popularity}</td>
@@ -83,44 +86,9 @@ function Search({clearSearchResults, getSongsBySongName, getAllMatchesBySongName
                     </tbody>
                 </table>
             </div>
-            <ModalWrapper open={modalOpen} onClose={onCloseModal} song={selected} />
+            <ModalWrapper open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} />
         </div>
     );
 }
 
-/**
- * Helper function for readability of keys.
- * @param value - key value
- */
-const whichKey = (value) => {
-    switch(value) {
-        case 0: return "C"
-        case 1: return "C#/Db"
-        case 2: return "D"
-        case 3: return "D#/Eb"
-        case 4: return "E"
-        case 5: return "F"
-        case 6: return "F#/Gb"
-        case 7: return "G"
-        case 8: return "G#/Ab"
-        case 9: return "A"
-        case 10: return "A#/Bb"
-        case 11: return "B"
-        default: return "..."
-    }
-}
-
-Search.propTypes = {
-    getSongsBySongName: PropTypes.func.isRequired,
-    clearSearchResults: PropTypes.func.isRequired,
-    getAllMatchesBySongName: PropTypes.func.isRequired,
-    searchResults: PropTypes.array
-}
-
-const mapStateToProps = state => ({
-    searchResults: state.searchReducer.searchResults,
-    searchMatches: state.matchReducer.searchMatches
-})
-
-
-export const ConnectedSearch = connect(mapStateToProps, { getSongsBySongName, clearSearchResults, getAllMatchesBySongName })(Search);
+export { Search };

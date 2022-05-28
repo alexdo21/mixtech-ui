@@ -1,50 +1,58 @@
 import React from "react";
 import Modal from "react-responsive-modal"
-import PropTypes from "prop-types"
-import { connect } from "react-redux"
-import { getIncompleteMatches, createMatch, pairMatch, getAllPlaylists, addSongToPlaylist } from "../../actions"
+import { getIncompleteMatches, createMatch, pairMatch, getAllPlaylists, addSongToPlaylist, whichKey, whichMode } from "../../services"
+import { GET_INCOMPLETE_MATCHES, CREATE_MATCH, PAIR_MATCH, GET_ALL_PLAYLISTS, ADD_SONG_TO_PLAYLIST } from "../../reducers/types"
+import { useSelector, useDispatch } from "react-redux";
 
-function ModalWrapper({getIncompleteMatches, getAllPlaylists, createMatch, pairMatch, addSongToPlaylist, song, open, onClose, incompleteMatches, playlists}) {
-    const [openAddMatches, setOpenAddMatches] = React.useState(false)
-    const [openAddPlaylists, setOpenAddPlaylists] = React.useState(false)
+function ModalWrapper({song, open, onClose}) {
+    const [isAddToMatchesModalOpen, setIsAddToMatchesModalOpen] = React.useState(false)
+    const [isAddToPlaylistsModalOpen, setIsAddToPlaylistsModalOpen] = React.useState(false)
     const [selectedMatch, setSelectedMatch] = React.useState(-1)
     const [selectedPlaylist, setSelectedPlaylist] = React.useState(-1)
 
-    React.useEffect(() => {
-        const fetchMatchesAndPlaylists = async () => {
-            await getIncompleteMatches()
-            await getAllPlaylists()
-        }
-        fetchMatchesAndPlaylists()
-    }, [getIncompleteMatches, getAllPlaylists, openAddMatches, openAddPlaylists])
+    const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
+    const playlists = useSelector(state => state.playlistReducer.playlists)
+    const dispatch = useDispatch()
 
-    const onOpenMatches = () => setOpenAddMatches(true)
-    const onCloseMatches = () => setOpenAddMatches(false)
-    const onOpenPlaylists = () => setOpenAddPlaylists(true)
-    const onClosePlaylists = () => setOpenAddPlaylists(false)
-    const handleNewMatch = async () => {
-        await createMatch(song)
-        await getIncompleteMatches()
+    React.useEffect(() => {
+        getIncompleteMatches()
+        .then(incompleteMatches => dispatch({ type: GET_INCOMPLETE_MATCHES, payload: incompleteMatches }))
+        .catch(err => console.log(err))
+        getAllPlaylists()
+        .then(playlists => dispatch({ type: GET_ALL_PLAYLISTS, payload: playlists }))
+        .catch(err => console.log(err))
+    }, [dispatch, isAddToMatchesModalOpen, isAddToPlaylistsModalOpen])
+
+    const handleCreateNewMatch = () => {
+        createMatch(song.id)
+        .then(() => {
+            dispatch({ type: CREATE_MATCH })
+            setIsAddToMatchesModalOpen(false)
+        }).catch(err => console.log(err))
     }
-    const handleMatchChange = (event) => setSelectedMatch(event.target.selected)
-    const handleMatchSubmit = async (event) => {
+    const handlePairMatch = (event) => {
         event.preventDefault()
-        const req = {
+        const pairMatchRequest = {
             matchId: selectedMatch,
             songId: song.id
         }
-        await pairMatch(req)
-        await getIncompleteMatches()
+        pairMatch(pairMatchRequest)
+        .then(() => {
+            dispatch({ type: PAIR_MATCH })
+            setIsAddToMatchesModalOpen(false)
+        }).catch(err => console.log(err))
     }
-    const handlePlaylistChange = (event) => setSelectedPlaylist(event.target.selected)
-    const handlePlaylistSubmit = async (event) => {
+    const handleAddSongToPlaylist = (event) => {
         event.preventDefault()
-        const req = {
+        const addSongToPlaylistRequest = {
             playlistId: selectedPlaylist,
             songId: song.id
         }
-        await addSongToPlaylist(req)
-        await getAllPlaylists()
+        addSongToPlaylist(addSongToPlaylistRequest)
+        .then(() => {
+            dispatch({ type: ADD_SONG_TO_PLAYLIST })
+            setIsAddToPlaylistsModalOpen(false)
+        }).catch(err => console.log(err))
     }
 
     return (
@@ -116,15 +124,15 @@ function ModalWrapper({getIncompleteMatches, getAllPlaylists, createMatch, pairM
                     </tbody>
                 </table>
                 <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={onOpenMatches}>Add to Matches</button>
-                    <button type="button" className="btn btn-primary" onClick={onOpenPlaylists}>Add to Playlists</button>
+                    <button type="button" className="btn btn-secondary" onClick={() => setIsAddToMatchesModalOpen(true)}>Add to Matches</button>
+                    <button type="button" className="btn btn-primary" onClick={() => setIsAddToPlaylistsModalOpen(true)}>Add to Playlists</button>
                 </div>
             </Modal>
-            <Modal open={openAddMatches} onClose={onCloseMatches}>
+            <Modal open={isAddToMatchesModalOpen} onClose={() => setIsAddToMatchesModalOpen(false)}>
                 <div className="modal-header">
                     <h4>Incomplete Matches</h4>
                 </div>
-                <form onSubmit={(event) => handleMatchSubmit(event).then(onCloseMatches)}>
+                <form onSubmit={handlePairMatch}>
                     <table className="table">
                         <thead>
                             <tr>
@@ -138,7 +146,7 @@ function ModalWrapper({getIncompleteMatches, getAllPlaylists, createMatch, pairM
                                     <td>
                                         <div className="form-check">
                                             <input className="form-check-input" type="radio" name="song" selected={match.id}
-                                            onChange={handleMatchChange}></input>
+                                            onChange={(event) => setSelectedMatch(event.target.selected)}></input>
                                             <label className="form-check-label">{match.songName1}</label>
                                         </div>
                                     </td>
@@ -148,16 +156,16 @@ function ModalWrapper({getIncompleteMatches, getAllPlaylists, createMatch, pairM
                         </tbody>
                     </table>
                     <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={(event) => handleNewMatch(event).then(onCloseMatches)}>Add New Match</button>
+                        <button type="button" className="btn btn-secondary" onClick={handleCreateNewMatch}>Add New Match</button>
                         <button type="submit" className="btn btn-primary">Add to selected Match</button>
                     </div>
                 </form>
             </Modal>
-            <Modal open={openAddPlaylists} onClose={onClosePlaylists}>
+            <Modal open={isAddToPlaylistsModalOpen} onClose={() => setIsAddToPlaylistsModalOpen(false)}>
                 <div className="modal-header">
                     <h4>Playlists</h4>
                 </div>
-                <form onSubmit={(event) => handlePlaylistSubmit(event).then(onClosePlaylists)}>
+                <form onSubmit={handleAddSongToPlaylist}>
                     <table className="table">
                         <thead>
                             <tr>
@@ -171,7 +179,7 @@ function ModalWrapper({getIncompleteMatches, getAllPlaylists, createMatch, pairM
                                     <td>
                                         <div className="form-check">
                                             <input className="form-check-input" type="radio" name="song" selected={playlist.id}
-                                            onChange={handlePlaylistChange}></input>
+                                            onChange={(event) => setSelectedPlaylist(event.target.selected)}></input>
                                             <label className="form-check-label">{playlist.name}</label>
                                         </div>
                                     </td>
@@ -189,54 +197,4 @@ function ModalWrapper({getIncompleteMatches, getAllPlaylists, createMatch, pairM
     )
 }
 
-/**
- * Helper function for which mode,
- * Major or Minor.
- * @param {*} value 
- */
-const whichMode = (value) => {
-    switch(value) {
-        case 0: return "Minor"
-        case 1: return "Major"
-        default: return ""
-    }
-}
-
-/**
- * Helper function for readability of keys.
- * @param value - key value
- */
-const whichKey = (value) => {
-    switch(value) {
-        case 0: return "C"
-        case 1: return "C#/Db"
-        case 2: return "D"
-        case 3: return "D#/Eb"
-        case 4: return "E"
-        case 5: return "F"
-        case 6: return "F#/Gb"
-        case 7: return "G"
-        case 8: return "G#/Ab"
-        case 9: return "A"
-        case 10: return "A#/Bb"
-        case 11: return "B"
-        default: return ""
-    }
-}
-
-ModalWrapper.propTypes = {
-    getIncompleteMatches: PropTypes.func,
-    getAllPlaylists: PropTypes.func,
-    createMatch: PropTypes.func,
-    pairMatch: PropTypes.func,
-    addSongToPlaylist: PropTypes.func,
-    incompleteMatches: PropTypes.array,
-    playlists: PropTypes.array
-}
-
-const mapStateToProps = state => ({
-    incompleteMatches: state.matchReducer.incompleteMatches,
-    playlists: state.playlistReducer.playlists
-})
-
-export const ConnectedModalWrapper = connect(mapStateToProps, { getIncompleteMatches, createMatch, pairMatch, getAllPlaylists, addSongToPlaylist })(ModalWrapper);
+export { ModalWrapper };
