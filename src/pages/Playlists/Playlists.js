@@ -25,27 +25,23 @@ function Playlists() {
 
     const handleCreateNewPlaylist = (event) => {
         event.preventDefault()
-        const newPlaylist = {
+        const newPlaylistRequest = {
             name: playlistName,
             description: description
         }
-        createPlaylist(newPlaylist)
-        .then(() => dispatch({ type: CREATE_PLAYLIST }))
-        .catch(err => console.log(err))
-        getAllPlaylists()
-        .then(playlists => {
-            dispatch({ type: GET_ALL_PLAYLISTS, payload: playlists })
+        createPlaylist(newPlaylistRequest)
+        .then(() => {
+            dispatch({ type: CREATE_PLAYLIST })
             setIsAddPlaylistModalOpen(false)
-        })
-        .catch(err => console.log(err))
+        }).catch(err => console.log(err))
     }
     const handleSelectedPlaylistToOpen = (event) => {
         const selectedPlaylist = event.target.selected
         getAllSongsInPlaylist(selectedPlaylist.id)
         .then(playlistSongs => {
             dispatch({ type: GET_ALL_SONGS_IN_PLAYLIST, payload: playlistSongs })
-            setIsPlaylistSongsModalOpen(true)
             setSelectedPlaylist(selectedPlaylist)
+            setIsPlaylistSongsModalOpen(true)
         })
         .catch(err => console.log(err))
     }
@@ -76,7 +72,10 @@ function Playlists() {
                             <tr key={i}>
                                 <td><button className="btn btn-light btn-lg" selected={playlist} onClick={handleSelectedPlaylistToOpen}>{playlist.name}</button></td>
                                 <td>{playlist.description}</td>
-                                <td><button className="btn btn-outline-danger btn-sm" value={playlist.id} onClick={handleDeletePlaylist}>X</button></td>
+                                <td>
+                                    <button className="btn btn-outline-success btn-sm">Add to Spotify</button>
+                                    <button className="btn btn-outline-danger btn-sm" value={playlist.id} onClick={handleDeletePlaylist}>X</button>
+                                </td>
                             </tr>     
                         )}
                     </tbody>

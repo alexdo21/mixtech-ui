@@ -1,4 +1,4 @@
-import { MATCH_ENDPOINT, REQUEST, ACCESS_TOKEN } from "."
+import { MATCH_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from "."
 
 const getCompleteMatches = () => {
     return new Promise((resolve, reject) => {
@@ -8,11 +8,11 @@ const getCompleteMatches = () => {
         fetch(`${MATCH_ENDPOINT}/complete`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
-                const completeMatches = res.matchDisplays.map(matchDisplay => ({
-                    id: matchDisplay.id,
-                    songName1: matchDisplay.songName1,
-                    songName2: matchDisplay.songName2
+            if (res.status === SUCCESS) {
+                const completeMatches = res.matches.map(match => ({
+                    id: match.id,
+                    song1: match.song1,
+                    song2: match.song2
                 }))
                 resolve(completeMatches)
             } else {
@@ -31,11 +31,11 @@ const getIncompleteMatches = () => {
         fetch(`${MATCH_ENDPOINT}/incomplete`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
-                const incompleteMatches = res.matchDisplays.map(matchDisplay => ({
-                    id: matchDisplay.id,
-                    songName1: matchDisplay.songName1,
-                    songName2: matchDisplay.songName2
+            if (res.status === SUCCESS) {
+                const incompleteMatches = res.matches.map(match => ({
+                    id: match.id,
+                    song1: match.song1,
+                    song2: match.song2
                 }))
                 resolve(incompleteMatches)
             } else {
@@ -46,7 +46,7 @@ const getIncompleteMatches = () => {
     })
 }
 
- const getAllMatchesBySongName = (songName) => {
+ const getCompleteMatchesBySongName = (songName) => {
     return new Promise((resolve, reject) => {
         REQUEST.method = "GET"
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
@@ -54,11 +54,11 @@ const getIncompleteMatches = () => {
         fetch(`${MATCH_ENDPOINT}/search?songName=${songName}`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
-                const matches = res.matchDisplays.map(matchDisplay => ({
-                    id: matchDisplay.id,
-                    songName1: matchDisplay.songName1,
-                    songName2: matchDisplay.songName2
+            if (res.status === SUCCESS) {
+                const matches = res.matches.map(match => ({
+                    id: match.id,
+                    song1: match.song1,
+                    song2: match.song2
                 }))
                 resolve(matches)
             } else {
@@ -75,18 +75,18 @@ const createMatch = (songId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${MATCH_ENDPOINT}/create/?songId1=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === "Success" ? resolve() : reject(res.errorMessage))
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
         .catch(err => reject(err))
     })
 }
 
-const pairMatch = (pairMatchRequest) => {
+const pairMatch = (matchId, songId) => {
     return new Promise((resolve, reject) => {
         REQUEST.method = "POST"
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
-        fetch(`${MATCH_ENDPOINT}/pair/${pairMatchRequest.matchId}?songId2=${pairMatchRequest.songId}`, REQUEST)
+        fetch(`${MATCH_ENDPOINT}/pair/${matchId}?songId2=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === "Success" ? resolve() : reject(res.errorMessage))
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
         .catch(err => reject(err))
     })
 }
@@ -97,9 +97,20 @@ const deleteMatch = (matchId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${MATCH_ENDPOINT}/delete/${matchId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === "Success" ? resolve() : reject(res.errorMessage))
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
         .catch(err => reject(err))
     })
 }
 
-export { getCompleteMatches, getIncompleteMatches, getAllMatchesBySongName, createMatch, pairMatch, deleteMatch };
+const addCompleteMatchToPlaylist = (matchId, playlistId) => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "POST"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        fetch(`${MATCH_ENDPOINT}/complete/add/playlist/${matchId}/${playlistId}`, REQUEST)
+        .then(res => res.json())
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
+        .catch(err => reject(err))
+    })
+}
+
+export { getCompleteMatches, getIncompleteMatches, getCompleteMatchesBySongName, createMatch, pairMatch, deleteMatch, addCompleteMatchToPlaylist };

@@ -1,4 +1,4 @@
-import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, GET_ALL_MATCHES_BY_SONG_NAME, CREATE_MATCH, PAIR_MATCH, DELETE_MATCH } from "./types"
+import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, GET_COMPLETE_MATCHES_BY_SONG_NAME, CREATE_MATCH, PAIR_MATCH, DELETE_MATCH } from "./types"
 
 const initialState = {
     completeMatches: [],
@@ -18,7 +18,7 @@ export const MatchReducer = (state=initialState, action) => {
                 ...state,
                 incompleteMatches: action.payload
             }
-        case GET_ALL_MATCHES_BY_SONG_NAME:
+        case GET_COMPLETE_MATCHES_BY_SONG_NAME:
             return {
                 ...state,
                 searchMatches: action.payload

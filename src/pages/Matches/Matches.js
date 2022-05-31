@@ -1,5 +1,6 @@
 import React from "react";
 import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, DELETE_MATCH } from "../../reducers/types"
+import { SpotifyPlayer } from "../../components";
 import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../services"
 import { useSelector, useDispatch } from "react-redux";
 import "./Matches.css"
@@ -35,7 +36,9 @@ function Matches() {
                 <table className="table">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Song 1</th>
+                            <th scope="col"></th>
                             <th scope="col">Song 2</th>
                             <th scope="col"></th>
                         </tr>
@@ -43,9 +46,14 @@ function Matches() {
                     <tbody>
                         {completeMatches.map((match, i) => 
                             <tr key={i}>
-                                <td>{match.songName1}</td>
-                                <td>{match.songName2}</td>
-                                <td><button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button></td>
+                                <td><SpotifyPlayer song={match.song1} /></td>
+                                <td>{match.song1.name}</td>
+                                <td><SpotifyPlayer song={match.song2} /></td>
+                                <td>{match.song2.name}</td>
+                                <td>
+                                    <button className="btn btn-outline-primary btn-sm">{"\u2713"}</button>
+                                    <button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button>
+                                </td>
                             </tr>  
                         )}
                     </tbody>
@@ -56,6 +64,7 @@ function Matches() {
                 <table className="table">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Song 1</th>
                             <th scope="col">Song 2</th>
                             <th scope="col"></th>
@@ -64,7 +73,8 @@ function Matches() {
                     <tbody>
                         {incompleteMatches.map((match, i) => 
                             <tr key={i}>
-                                <td>{match.songName1}</td>
+                                <td><SpotifyPlayer song={match.song1} /></td>
+                                <td>{match.song1.name}</td>
                                 <td>...</td>
                                 <td><button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button></td>
                             </tr>  

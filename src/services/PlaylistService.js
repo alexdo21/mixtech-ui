@@ -1,4 +1,4 @@
-import { PLAYLIST_ENDPOINT, REQUEST, ACCESS_TOKEN } from ".";
+import { PLAYLIST_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from ".";
 
 const getAllPlaylists = () => {
     return new Promise((resolve, reject) => {
@@ -8,7 +8,7 @@ const getAllPlaylists = () => {
         fetch(`${PLAYLIST_ENDPOINT}/all`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
+            if (res.status === SUCCESS) {
                 const results = res.playlists.map(playlist => ({
                     id: playlist.id,
                     name: playlist.name,
@@ -30,7 +30,7 @@ const getAllSongsInPlaylist = (playlistId) => {
         fetch(`${PLAYLIST_ENDPOINT}/songs/${playlistId}`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
+            if (res.status === SUCCESS) {
                 const songs = res.songs.map(song => ({
                     id: song.spotifyId,
                     name: song.name,
@@ -59,25 +59,36 @@ const getAllSongsInPlaylist = (playlistId) => {
     })
 }
 
-const createPlaylist = (data) => {
+const createPlaylist = (newPlaylistRequest) => {
     return new Promise((resolve, reject) => {
         REQUEST.method = "POST"
-        REQUEST.body = JSON.stringify(data)
+        REQUEST.body = JSON.stringify(newPlaylistRequest)
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/create`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === "Success" ? resolve() : reject(res.errorMessage))
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
         .catch(err => reject(err))
     })
 }
 
-const addSongToPlaylist = (addSongToPlaylistRequest) => {
+const addSongToPlaylist = (playlistId, songId) => {
     return new Promise((resolve, reject) => {
         REQUEST.method = "POST"
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
-        fetch(`${PLAYLIST_ENDPOINT}/songs/add/${addSongToPlaylistRequest.playlistId}?songId=${addSongToPlaylistRequest.songId}`, REQUEST)
+        fetch(`${PLAYLIST_ENDPOINT}/songs/add/${playlistId}?songId=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === "Success" ? resolve() : reject(res.errorMessage))
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
+        .catch(err => reject(err))
+    })
+}
+
+const deleteSongFromPlaylist = (playlistId, songId) => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "POST"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        fetch(`${PLAYLIST_ENDPOINT}/songs/delete/${playlistId}?songId=${songId}`, REQUEST)
+        .then(res => res.json())
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
         .catch(err => reject(err))
     })
 }
@@ -88,9 +99,20 @@ const deletePlaylist = (playlistId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/delete/${playlistId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === "Success" ? resolve() : reject(res.errorMessage))
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
         .catch(err => reject(err))
     })
 }
 
-export { getAllPlaylists, getAllSongsInPlaylist, createPlaylist, addSongToPlaylist, deletePlaylist };
+const addPlaylistOnSpotify = (playlistId) => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "POST"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        fetch(`${PLAYLIST_ENDPOINT}/add/spotify/${playlistId}`, REQUEST)
+        .then(res => res.json())
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
+        .catch(err => reject(err))
+    })
+}
+
+export { getAllPlaylists, getAllSongsInPlaylist, createPlaylist, addSongToPlaylist, deleteSongFromPlaylist, deletePlaylist, addPlaylistOnSpotify };

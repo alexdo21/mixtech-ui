@@ -1,4 +1,4 @@
-import { GET_SONGS_BY_SONG_NAME, GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "./types"
+import { GET_SONGS_BY_QUERY, GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "./types"
 
 const initialState = {
   searchResults: []
@@ -6,7 +6,7 @@ const initialState = {
 
 export const SearchReducer = (state=initialState, action) => {
     switch (action.type) {
-      case GET_SONGS_BY_SONG_NAME:
+      case GET_SONGS_BY_QUERY:
         return {
           ...state,
           searchResults: action.payload

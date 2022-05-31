@@ -1,10 +1,11 @@
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, GET_USER_INFO, LOGOUT } from "./types"
+import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, GET_USER_INFO, SPOTIFY_PLAYER_READY, SPOTIFY_PLAYER_NOT_READY, LOGOUT } from "./types"
 
 
 const initialState = {
     isFetching: false,
     isAuthenticated: false,
-    user: null
+    user: null,
+    deviceId: null
 }
 
 export const UserReducer = (state=initialState, action) => {
@@ -29,6 +30,16 @@ export const UserReducer = (state=initialState, action) => {
             return {
                 ...state,
                 user: action.payload
+            }
+        case SPOTIFY_PLAYER_READY:
+            return {
+                ...state,
+                deviceId: action.payload
+            }
+        case SPOTIFY_PLAYER_NOT_READY:
+            return {
+                ...state,
+                deviceId: null
             }
         case LOGOUT:
             return {

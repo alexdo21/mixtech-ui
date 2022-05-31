@@ -1,8 +1,4 @@
-import { USER_ENDPOINT, REQUEST, ACCESS_TOKEN } from "."
-
-const logout = () => {
-    localStorage.removeItem(ACCESS_TOKEN)
-}
+import { USER_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from "."
 
 const getUserInfo = () => {
     return new Promise((resolve, reject) => {
@@ -12,7 +8,7 @@ const getUserInfo = () => {
         fetch(`${USER_ENDPOINT}/info`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
+            if (res.status === SUCCESS) {
                 const user = res.user
                 resolve(user)
             } else {
@@ -22,4 +18,62 @@ const getUserInfo = () => {
     })
 }
 
-export { logout, getUserInfo };
+const getUserAccessToken = () => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "GET"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        delete REQUEST.body
+        fetch(`${USER_ENDPOINT}/access-token`, REQUEST)
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === SUCCESS) {
+                const accessToken = res.accessToken
+                resolve(accessToken)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
+    })
+}
+
+const startSong = (songId, deviceId) => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "POST"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        fetch(`${USER_ENDPOINT}/player/start/${songId}/${deviceId}`, REQUEST)
+        .then(res => res.json())
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
+        .catch(err => reject(err))
+    })
+}
+
+const resumeSong = (deviceId) => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "POST"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        fetch(`${USER_ENDPOINT}/player/resume/${deviceId}`, REQUEST)
+        .then(res => res.json())
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
+        .catch(err => reject(err))
+    })
+}
+
+const pauseSong = (deviceId) => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "POST"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        fetch(`${USER_ENDPOINT}/player/pause/${deviceId}`, REQUEST)
+        .then(res => res.json())
+        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
+        .catch(err => reject(err))
+    })
+}
+
+const logout = () => {
+    return new Promise((resolve, reject) => {
+        localStorage.removeItem(ACCESS_TOKEN)
+        resolve()
+    })
+}
+
+export { getUserInfo, getUserAccessToken, startSong, resumeSong, pauseSong, logout };

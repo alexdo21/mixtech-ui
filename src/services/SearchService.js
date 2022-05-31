@@ -1,16 +1,16 @@
-import { SEARCH_ENDPOINT, REQUEST, ACCESS_TOKEN } from "."
+import { SEARCH_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from "."
 
-const getSongsBySongName = (songName) => {
+const getSongsByQuery = (query) => {
     return new Promise((resolve, reject) => {
         REQUEST.method = "GET"
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         delete REQUEST.body
-        fetch(`${SEARCH_ENDPOINT}/basic?songName=${songName}`, REQUEST)
+        fetch(`${SEARCH_ENDPOINT}/basic?query=${query}`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
+            if (res.status === SUCCESS) {
                 const searchResults = res.songs.map(song => ({
-                    id: song.spotifyId,
+                    spotifyId: song.spotifyId,
                     name: song.name,
                     albumName: song.albumName,
                     artistName: song.artistName,
@@ -45,7 +45,7 @@ const getSongsByAudioFeatures = (advancedSearchRequest) => {
         fetch(`${SEARCH_ENDPOINT}/advanced`, REQUEST)
         .then(res => res.json())
         .then(res => {
-            if (res.status === "Success") {
+            if (res.status === SUCCESS) {
                 const searchResults = res.songs.map(song => ({
                     id: song.spotifyId,
                     name: song.name,
@@ -74,4 +74,4 @@ const getSongsByAudioFeatures = (advancedSearchRequest) => {
     })
 }
 
-export { getSongsBySongName, getSongsByAudioFeatures };
+export { getSongsByQuery, getSongsByAudioFeatures };

@@ -1,13 +1,13 @@
 import React from "react";
-import { ModalWrapper } from "../../components"
-import { getSongsBySongName, getAllMatchesBySongName, whichKey } from "../../services"
-import { GET_SONGS_BY_SONG_NAME, CLEAR_SEARCH_RESULTS, GET_ALL_MATCHES_BY_SONG_NAME } from "../../reducers/types"
+import { ModalWrapper, SpotifyPlayer } from "../../components"
+import { getSongsByQuery, getCompleteMatchesBySongName, whichKey } from "../../services"
+import { GET_SONGS_BY_QUERY, CLEAR_SEARCH_RESULTS, GET_COMPLETE_MATCHES_BY_SONG_NAME } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import "./Search.css"
 
 
 function Search() {
-    const [songName, setSongName] = React.useState("")
+    const [query, setQuery] = React.useState("")
     const [isSongDetailsModalOpen, setIsSongDetailsModalOpen] = React.useState(false)
     const [selectedSong, setSelectedSong] = React.useState(null)
 
@@ -21,11 +21,11 @@ function Search() {
 
     const handleSearchSong = (event) => {
         event.preventDefault()
-        getSongsBySongName(songName)
-        .then(searchResults => dispatch({ type: GET_SONGS_BY_SONG_NAME, payload: searchResults }))
+        getSongsByQuery(query)
+        .then(searchResults => dispatch({ type: GET_SONGS_BY_QUERY, payload: searchResults }))
         .catch(err => console.log(err))
-        getAllMatchesBySongName(songName)
-        .then(searchMatches => dispatch({ type: GET_ALL_MATCHES_BY_SONG_NAME, payload: searchMatches }) )
+        getCompleteMatchesBySongName(query)
+        .then(searchMatches => dispatch({ type: GET_COMPLETE_MATCHES_BY_SONG_NAME, payload: searchMatches }) )
         .catch(err => console.log(err))
     }
     const handleSelectedSongToOpen = (event) => {
@@ -39,8 +39,8 @@ function Search() {
                 <form onSubmit={handleSearchSong}>
                     <div className="form-group"> 
                         <label htmlFor="search"><h1>Search</h1></label>
-                        <input type="text" className="form-control" name="songName" placeholder="Enter song name"
-                        onChange={(event) => setSongName(event.target.value)}></input>
+                        <input type="text" className="form-control" name="songName" placeholder="Search for song"
+                        onChange={(event) => setQuery(event.target.value)}></input>
                     </div>
                     <button type="submit" className="btn btn-primary">Search</button>
                 </form>
@@ -49,6 +49,7 @@ function Search() {
                 <table className="table">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Song</th>
                             <th scope="col">Key</th>
                             <th scope="col">Tempo (BPM)</th>
@@ -58,6 +59,7 @@ function Search() {
                     <tbody>
                         {searchResults.map((song, i) =>
                             <tr key={i}>
+                                <td><SpotifyPlayer song={song} /></td>
                                 <td><button className="btn btn-light btn-lg" selected={song} onClick={handleSelectedSongToOpen}>{song.name}</button></td>
                                 <td>{whichKey(song.key)}</td>
                                 <td>{song.tempo}</td>
@@ -79,8 +81,8 @@ function Search() {
                     <tbody>
                         {searchMatches.map((match, i) => 
                             <tr key={i}>
-                                <td>{match.songName1}</td>
-                                <td>{match.songName2}</td>
+                                <td>{match.song1.name}</td>
+                                <td>{match.song2.name}</td>
                             </tr>  
                         )}
                     </tbody>

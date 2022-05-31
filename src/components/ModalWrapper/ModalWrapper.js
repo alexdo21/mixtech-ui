@@ -24,7 +24,7 @@ function ModalWrapper({song, open, onClose}) {
     }, [dispatch, isAddToMatchesModalOpen, isAddToPlaylistsModalOpen])
 
     const handleCreateNewMatch = () => {
-        createMatch(song.id)
+        createMatch(song.spotifyId)
         .then(() => {
             dispatch({ type: CREATE_MATCH })
             setIsAddToMatchesModalOpen(false)
@@ -32,11 +32,7 @@ function ModalWrapper({song, open, onClose}) {
     }
     const handlePairMatch = (event) => {
         event.preventDefault()
-        const pairMatchRequest = {
-            matchId: selectedMatch,
-            songId: song.id
-        }
-        pairMatch(pairMatchRequest)
+        pairMatch(selectedMatch, song.spotifyId)
         .then(() => {
             dispatch({ type: PAIR_MATCH })
             setIsAddToMatchesModalOpen(false)
@@ -44,11 +40,7 @@ function ModalWrapper({song, open, onClose}) {
     }
     const handleAddSongToPlaylist = (event) => {
         event.preventDefault()
-        const addSongToPlaylistRequest = {
-            playlistId: selectedPlaylist,
-            songId: song.id
-        }
-        addSongToPlaylist(addSongToPlaylistRequest)
+        addSongToPlaylist(selectedPlaylist, song.spotifyId)
         .then(() => {
             dispatch({ type: ADD_SONG_TO_PLAYLIST })
             setIsAddToPlaylistsModalOpen(false)
@@ -147,7 +139,7 @@ function ModalWrapper({song, open, onClose}) {
                                         <div className="form-check">
                                             <input className="form-check-input" type="radio" name="song" selected={match.id}
                                             onChange={(event) => setSelectedMatch(event.target.selected)}></input>
-                                            <label className="form-check-label">{match.songName1}</label>
+                                            <label className="form-check-label">{match.song1.name}</label>
                                         </div>
                                     </td>
                                     <td>...</td>

@@ -12,6 +12,7 @@ function PlaylistSongs({playlist, open, onClose, playlistSongs}) {
                     <tr>
                         <th scope="col"></th>
                         <th scope="col">Song</th>
+                        <th scope="col"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -19,6 +20,7 @@ function PlaylistSongs({playlist, open, onClose, playlistSongs}) {
                         <tr key={i}>
                             <td>{i}</td>
                             <td>{song.name}</td>
+                            <td><button className="btn btn-outline-danger btn-sm">X</button></td>
                         </tr>    
                     )}
                 </tbody>
