@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from "react-responsive-modal"
 import { PlaylistSongs } from "../../components"
-import { getAllPlaylists, createPlaylist, deletePlaylist, getAllSongsInPlaylist } from "../../services"
+import { getAllPlaylists, createPlaylist, deletePlaylist, getAllSongsInPlaylist, addPlaylistOnSpotify } from "../../services"
 import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, CREATE_PLAYLIST, DELETE_PLAYLIST } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import "./Playlists.css"
@@ -21,6 +21,7 @@ function Playlists() {
     React.useEffect(() => {
         getAllPlaylists()
         .then(playlists => dispatch({ type: GET_ALL_PLAYLISTS, payload: playlists }))
+        .catch(err => console.log(err))
     }, [dispatch, isAddPlaylistModalOpen])
 
     const handleCreateNewPlaylist = (event) => {
@@ -42,7 +43,12 @@ function Playlists() {
             dispatch({ type: GET_ALL_SONGS_IN_PLAYLIST, payload: playlistSongs })
             setSelectedPlaylist(selectedPlaylist)
             setIsPlaylistSongsModalOpen(true)
-        })
+        }).catch(err => console.log(err))
+    }
+    const handleAddOnSpotify = (event) => {
+        const playlistId = event.target.value
+        addPlaylistOnSpotify(playlistId)
+        .then(() => alert("Playlist added on spotify succesfully"))
         .catch(err => console.log(err))
     }
     const handleDeletePlaylist = (event) => {
@@ -68,12 +74,12 @@ function Playlists() {
                         </tr>
                     </thead>
                     <tbody>
-                        {playlists.map((playlist, i) => 
-                            <tr key={i}>
+                        {playlists.map((playlist) => 
+                            <tr key={playlist.id}>
                                 <td><button className="btn btn-light btn-lg" selected={playlist} onClick={handleSelectedPlaylistToOpen}>{playlist.name}</button></td>
                                 <td>{playlist.description}</td>
                                 <td>
-                                    <button className="btn btn-outline-success btn-sm">Add to Spotify</button>
+                                    <button className="btn btn-outline-success btn-sm" value={playlist.id} onClick={handleAddOnSpotify}>Add On Spotify</button>
                                     <button className="btn btn-outline-danger btn-sm" value={playlist.id} onClick={handleDeletePlaylist}>X</button>
                                 </td>
                             </tr>     

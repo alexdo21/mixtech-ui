@@ -1,4 +1,4 @@
-import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, CREATE_PLAYLIST, ADD_SONG_TO_PLAYLIST, DELETE_PLAYLIST } from "./types"
+import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, CREATE_PLAYLIST, ADD_SONG_TO_PLAYLIST, DELETE_PLAYLIST, DELETE_SONG_FROM_PLAYLIST } from "./types"
 
 const initialState = {
     playlists: [],
@@ -24,6 +24,11 @@ export const PlaylistReducer = (state=initialState, action) => {
         case ADD_SONG_TO_PLAYLIST:
             return {
                 ...state
+            }
+        case DELETE_SONG_FROM_PLAYLIST:
+            return {
+                ...state,
+                playlistSongs: state.playlistSongs.filter(song => song.spotifyId !== action.payload)
             }
         case DELETE_PLAYLIST:
             return {

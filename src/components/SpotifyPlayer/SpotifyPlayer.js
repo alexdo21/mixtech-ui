@@ -1,13 +1,22 @@
 import React from 'react';
 import { startSong, resumeSong, pauseSong } from "../../services"
-import { useSelector } from "react-redux";
+import { SWITCH_SONG } from '../../reducers/types';
+import { useSelector, useDispatch } from "react-redux";
 
 function SpotifyPlayer({ song }) {
     const [isPlaying, setIsPlaying] = React.useState(false)
     const [started, setStarted] = React.useState(false)
-    console.log(song)
 
     const deviceId = useSelector(state => state.userReducer.deviceId)
+    const currentSong = useSelector(state => state.userReducer.currentSong)
+    const dispatch = useDispatch()
+
+    React.useEffect(() => {
+        if (currentSong !== song.spotifyId) {
+            setStarted(false)
+            setIsPlaying(false)
+        }
+    }, [currentSong])
 
     React.useEffect(() => {
         return () => {
@@ -17,18 +26,23 @@ function SpotifyPlayer({ song }) {
     }, [deviceId])
 
     const togglePlay = () => {
+        const songId = song.spotifyId
         if (!started) {
-            startSong(song.spotifyId, deviceId)
+            console.log("Starting ", song.name, song.spotifyId)
+            startSong(songId, deviceId)
             .then(() => {
+                dispatch({ type: SWITCH_SONG, payload: songId })
                 setIsPlaying(true)
                 setStarted(true)
             }).catch(err => console.log(err))
         } else {
             if (isPlaying) {
+                console.log("Pausing  ", song.name)
                 pauseSong(deviceId)
                 .then(() => setIsPlaying(false))
                 .catch(err => console.log(err))
             } else {
+                console.log("Resuming  ", song.name)
                 resumeSong(deviceId)
                 .then(() => setIsPlaying(true))
                 .catch(err => console.log(err))

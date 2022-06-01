@@ -1,11 +1,14 @@
 import React from "react";
 import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, DELETE_MATCH } from "../../reducers/types"
-import { SpotifyPlayer } from "../../components";
-import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../services"
+import { SongDetails, SpotifyPlayer } from "../../components";
+import { getCompleteMatches, getIncompleteMatches, deleteMatch, addCompleteMatchToPlaylist } from "../../services"
 import { useSelector, useDispatch } from "react-redux";
 import "./Matches.css"
 
 function Matches() {
+    const [isSongDetailsModalOpen, setIsSongDetailsModalOpen] = React.useState(false)
+    const [selectedSong, setSelectedSong] = React.useState(null)
+
     const completeMatches = useSelector(state => state.matchReducer.completeMatches)
     const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
     const dispatch = useDispatch()
@@ -19,11 +22,18 @@ function Matches() {
         .catch(err => console.log(err))
     }, [dispatch])
 
+    const handleAddToPlaylist = (event) => {
+
+    }
     const handleDelete = (event) => {
         const matchId = event.target.value
         deleteMatch(matchId)
         .then(() => dispatch({ type: DELETE_MATCH, payload: Number(matchId) }))
         .catch(err => console.log(err))
+    }
+    const handleSelectedSongToOpen = (event) => {
+        setSelectedSong(event.target.selected)
+        setIsSongDetailsModalOpen(true)
     }
 
     return (
@@ -44,14 +54,14 @@ function Matches() {
                         </tr>
                     </thead>
                     <tbody>
-                        {completeMatches.map((match, i) => 
-                            <tr key={i}>
+                        {completeMatches.map((match) => 
+                            <tr key={match.id}>
                                 <td><SpotifyPlayer song={match.song1} /></td>
-                                <td>{match.song1.name}</td>
+                                <td><button className="btn btn-light btn-lg" selected={match.song1} onClick={handleSelectedSongToOpen}>{match.song1.name}</button></td>
                                 <td><SpotifyPlayer song={match.song2} /></td>
-                                <td>{match.song2.name}</td>
+                                <td><button className="btn btn-light btn-lg" selected={match.song2} onClick={handleSelectedSongToOpen}>{match.song2.name}</button></td>
                                 <td>
-                                    <button className="btn btn-outline-primary btn-sm">{"\u2713"}</button>
+                                    <button className="btn btn-outline-primary btn-sm" value={match.id} onClick={handleAddToPlaylist}>{"\u2713"}</button>
                                     <button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button>
                                 </td>
                             </tr>  
@@ -71,10 +81,10 @@ function Matches() {
                         </tr>
                     </thead>
                     <tbody>
-                        {incompleteMatches.map((match, i) => 
-                            <tr key={i}>
+                        {incompleteMatches.map((match) => 
+                            <tr key={match.id}>
                                 <td><SpotifyPlayer song={match.song1} /></td>
-                                <td>{match.song1.name}</td>
+                                <td><button className="btn btn-light btn-lg" selected={match.song1} onClick={handleSelectedSongToOpen}>{match.song1.name}</button></td>
                                 <td>...</td>
                                 <td><button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button></td>
                             </tr>  
@@ -82,6 +92,7 @@ function Matches() {
                     </tbody>
                 </table>
             </div>
+            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} />
         </div>
     );
 }

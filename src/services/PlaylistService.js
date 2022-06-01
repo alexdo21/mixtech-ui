@@ -32,7 +32,7 @@ const getAllSongsInPlaylist = (playlistId) => {
         .then(res => {
             if (res.status === SUCCESS) {
                 const songs = res.songs.map(song => ({
-                    id: song.spotifyId,
+                    spotifyId: song.spotifyId,
                     name: song.name,
                     albumName: song.albumName,
                     artist: song.artistName,
@@ -84,7 +84,7 @@ const addSongToPlaylist = (playlistId, songId) => {
 
 const deleteSongFromPlaylist = (playlistId, songId) => {
     return new Promise((resolve, reject) => {
-        REQUEST.method = "POST"
+        REQUEST.method = "DELETE"
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/songs/delete/${playlistId}?songId=${songId}`, REQUEST)
         .then(res => res.json())

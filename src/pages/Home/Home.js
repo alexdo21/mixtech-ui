@@ -13,6 +13,12 @@ function Home() {
     const dispatch = useDispatch()
 
     React.useEffect(() => {
+        getUserInfo()
+        .then(user => dispatch({ type: GET_USER_INFO, payload: user }))
+        .catch(err => console.log(err))
+    }, [dispatch])
+
+    React.useEffect(() => {
         const script = document.createElement("script");
         script.src = "https://sdk.scdn.co/spotify-player.js";
         script.async = true;
@@ -38,15 +44,12 @@ function Home() {
                 dispatch({ type: SPOTIFY_PLAYER_NOT_READY })
             });
             player.addListener("player_state_changed", ({ position, duration, track_window: { current_track } }) => {
-                console.log("Currently Playing", current_track);
-                console.log("Position in Song", position);
-                console.log("Duration of Song", duration);
+                // console.log("Currently Playing", current_track);
+                // console.log("Position in Song", position);
+                // console.log("Duration of Song", duration);
             });
             player.connect();
         };
-        getUserInfo()
-        .then(user => dispatch({ type: GET_USER_INFO, payload: user }))
-        .catch(err => console.log(err))
     }, [dispatch])
 
     return (

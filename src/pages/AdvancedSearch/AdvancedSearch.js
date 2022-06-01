@@ -1,6 +1,6 @@
 import React from "react";
-import { ModalWrapper } from "../../components"
-import { getSongsByAudioFeatures, whichKey } from "../../services"
+import { SongDetails, SpotifyPlayer } from "../../components"
+import { getSongsByAudioFeatures, whichKey, whichMode } from "../../services"
 import { GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import InputRange from "react-input-range"
@@ -188,6 +188,7 @@ function AdvancedSearch() {
                 <table className="table">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Song</th>
                             <th scope="col">Key</th>
                             <th scope="col">Tempo (BPM)</th>
@@ -195,10 +196,11 @@ function AdvancedSearch() {
                         </tr>
                     </thead>
                     <tbody>
-                    {searchResults.map((song, i) =>
-                        <tr key={i}>
+                    {searchResults.map((song) =>
+                        <tr key={song.spotifyId}>
+                            <td><SpotifyPlayer song={song} /></td>
                             <td><button className="btn btn-light btn-lg" selected={song} onClick={handleSelectedSongToOpen}>{song.name}</button></td>
-                            <td>{whichKey(song.key)}</td>
+                            <td>{whichKey(song.key)} {whichMode(song.mode)}</td>
                             <td>{song.tempo}</td>
                             <td>{song.popularity}</td>
                         </tr>
@@ -206,7 +208,7 @@ function AdvancedSearch() {
                     </tbody>
                 </table>
             </div>
-            <ModalWrapper open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong}/>
+            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong}/>
         </div>
     );
 }

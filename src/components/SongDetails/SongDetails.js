@@ -4,7 +4,7 @@ import { getIncompleteMatches, createMatch, pairMatch, getAllPlaylists, addSongT
 import { GET_INCOMPLETE_MATCHES, CREATE_MATCH, PAIR_MATCH, GET_ALL_PLAYLISTS, ADD_SONG_TO_PLAYLIST } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 
-function ModalWrapper({song, open, onClose}) {
+function SongDetails({song, open, onClose}) {
     const [isAddToMatchesModalOpen, setIsAddToMatchesModalOpen] = React.useState(false)
     const [isAddToPlaylistsModalOpen, setIsAddToPlaylistsModalOpen] = React.useState(false)
     const [selectedMatch, setSelectedMatch] = React.useState(-1)
@@ -52,7 +52,11 @@ function ModalWrapper({song, open, onClose}) {
         <div></div> : 
         <div>
             <Modal open={open} onClose={onClose}>
-                <div className="modal-header"><h3>{song.name} from {song.albumName}</h3></div>
+                <div className="modal-header">
+                    <h4>{song.name}</h4><br/>
+                    <h6>{song.artistName} <br/>
+                    {song.albumName} </h6>
+                </div>
                 <table className="table">
                     <thead>
                         <tr>
@@ -133,8 +137,8 @@ function ModalWrapper({song, open, onClose}) {
                             </tr>
                         </thead>
                         <tbody>  
-                            {incompleteMatches.map((match, i) => 
-                                <tr key={i}>
+                            {incompleteMatches.map((match) => 
+                                <tr key={match.id}>
                                     <td>
                                         <div className="form-check">
                                             <input className="form-check-input" type="radio" name="song" selected={match.id}
@@ -166,8 +170,8 @@ function ModalWrapper({song, open, onClose}) {
                             </tr>
                         </thead>
                         <tbody>  
-                            {playlists.map((playlist, i) => 
-                                <tr key={i}>
+                            {playlists.map((playlist) => 
+                                <tr key={playlist.id}>
                                     <td>
                                         <div className="form-check">
                                             <input className="form-check-input" type="radio" name="song" selected={playlist.id}
@@ -189,4 +193,4 @@ function ModalWrapper({song, open, onClose}) {
     )
 }
 
-export { ModalWrapper };
+export { SongDetails };
