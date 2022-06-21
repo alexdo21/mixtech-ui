@@ -1,196 +1,93 @@
 import React from "react";
 import Modal from "react-responsive-modal"
-import { getIncompleteMatches, createMatch, pairMatch, getAllPlaylists, addSongToPlaylist, whichKey, whichMode } from "../../services"
-import { GET_INCOMPLETE_MATCHES, CREATE_MATCH, PAIR_MATCH, GET_ALL_PLAYLISTS, ADD_SONG_TO_PLAYLIST } from "../../reducers/types"
-import { useSelector, useDispatch } from "react-redux";
+import { AddMatches, AddPlaylists } from "../"
+import { whichKey, whichMode } from "../../services"
 
-function SongDetails({song, open, onClose}) {
+function SongDetails({open, onClose, song, addMatchesModal, addPlaylistsModal}) {
     const [isAddToMatchesModalOpen, setIsAddToMatchesModalOpen] = React.useState(false)
     const [isAddToPlaylistsModalOpen, setIsAddToPlaylistsModalOpen] = React.useState(false)
-    const [selectedMatch, setSelectedMatch] = React.useState(-1)
-    const [selectedPlaylist, setSelectedPlaylist] = React.useState(-1)
 
-    const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
-    const playlists = useSelector(state => state.playlistReducer.playlists)
-    const dispatch = useDispatch()
-
-    React.useEffect(() => {
-        getIncompleteMatches()
-        .then(incompleteMatches => dispatch({ type: GET_INCOMPLETE_MATCHES, payload: incompleteMatches }))
-        .catch(err => console.log(err))
-        getAllPlaylists()
-        .then(playlists => dispatch({ type: GET_ALL_PLAYLISTS, payload: playlists }))
-        .catch(err => console.log(err))
-    }, [dispatch, isAddToMatchesModalOpen, isAddToPlaylistsModalOpen])
-
-    const handleCreateNewMatch = () => {
-        createMatch(song.spotifyId)
-        .then(() => {
-            dispatch({ type: CREATE_MATCH })
-            setIsAddToMatchesModalOpen(false)
-        }).catch(err => console.log(err))
-    }
-    const handlePairMatch = (event) => {
-        event.preventDefault()
-        pairMatch(selectedMatch, song.spotifyId)
-        .then(() => {
-            dispatch({ type: PAIR_MATCH })
-            setIsAddToMatchesModalOpen(false)
-        }).catch(err => console.log(err))
-    }
-    const handleAddSongToPlaylist = (event) => {
-        event.preventDefault()
-        addSongToPlaylist(selectedPlaylist, song.spotifyId)
-        .then(() => {
-            dispatch({ type: ADD_SONG_TO_PLAYLIST })
-            setIsAddToPlaylistsModalOpen(false)
-        }).catch(err => console.log(err))
-    }
-
-    return (
-        song === null ?
-        <div></div> : 
-        <div>
-            <Modal open={open} onClose={onClose}>
-                <div className="modal-header">
-                    <h4>{song.name}</h4><br/>
-                    <h6>{song.artistName} <br/>
-                    {song.albumName} </h6>
-                </div>
-                <table className="table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Feature</th>
-                            <th scope="col">Value</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Key</td>
-                            <td>{whichKey(song.key)}</td>
-                        </tr>
-                        <tr>
-                            <td>Mode</td>
-                            <td>{whichMode(song.mode)}</td>
-                        </tr>
-                        <tr>
-                            <td>Tempo (BPM)</td>
-                            <td>{song.tempo}</td>
-                        </tr>
-                        <tr>
-                            <td>Duration</td>
-                            <td>{song.durationMs}</td>
-                        </tr>
-                        <tr>
-                            <td>Danceability</td>
-                            <td>{song.danceability}</td>
-                        </tr>
-                        <tr>
-                            <td>Energy</td>
-                            <td>{song.energy}</td>
-                        </tr>
-                        <tr>
-                            <td>Valence</td>
-                            <td>{song.valence}</td>
-                        </tr>
-                        <tr>
-                            <td>Loudness</td>
-                            <td>{song.loudness}</td>
-                        </tr>
-                        <tr>
-                            <td>Liveness</td>
-                            <td>{song.liveness}</td>
-                        </tr>
-                        <tr>
-                            <td>Acousticness</td>
-                            <td>{song.acousticness}</td>
-                        </tr>
-                        <tr>
-                            <td>Time Signature</td>
-                            <td>{song.timeSignature}</td>
-                        </tr>
-                        <tr>
-                            <td>Speechiness</td>
-                            <td>{song.speechiness}</td>
-                        </tr>
-                        <tr>
-                            <td>Instrumentalness</td>
-                            <td>{song.instrumentalness}</td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div className="modal-footer">
-                    <button type="button" className="btn btn-secondary" onClick={() => setIsAddToMatchesModalOpen(true)}>Add to Matches</button>
-                    <button type="button" className="btn btn-primary" onClick={() => setIsAddToPlaylistsModalOpen(true)}>Add to Playlists</button>
-                </div>
-            </Modal>
-            <Modal open={isAddToMatchesModalOpen} onClose={() => setIsAddToMatchesModalOpen(false)}>
-                <div className="modal-header">
-                    <h4>Incomplete Matches</h4>
-                </div>
-                <form onSubmit={handlePairMatch}>
+    if (song != null) {
+        return (
+            <>
+                <Modal open={open} onClose={onClose}>
+                    <div className="modal-header">
+                        <h4>{song.name}</h4><br/>
+                        <h6>{song.artistName} <br/>
+                        {song.albumName} </h6>
+                    </div>
                     <table className="table">
                         <thead>
                             <tr>
-                                <th scope="col">Song 1</th>
-                                <th scope="col">    </th>
+                                <th scope="col">Feature</th>
+                                <th scope="col">Value</th>
                             </tr>
                         </thead>
-                        <tbody>  
-                            {incompleteMatches.map((match) => 
-                                <tr key={match.id}>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="radio" name="song" selected={match.id}
-                                            onChange={(event) => setSelectedMatch(event.target.selected)}></input>
-                                            <label className="form-check-label">{match.song1.name}</label>
-                                        </div>
-                                    </td>
-                                    <td>...</td>
-                                </tr>  
-                            )}
-                        </tbody>
-                    </table>
-                    <div className="modal-footer">
-                        <button type="button" className="btn btn-secondary" onClick={handleCreateNewMatch}>Add New Match</button>
-                        <button type="submit" className="btn btn-primary">Add to selected Match</button>
-                    </div>
-                </form>
-            </Modal>
-            <Modal open={isAddToPlaylistsModalOpen} onClose={() => setIsAddToPlaylistsModalOpen(false)}>
-                <div className="modal-header">
-                    <h4>Playlists</h4>
-                </div>
-                <form onSubmit={handleAddSongToPlaylist}>
-                    <table className="table">
-                        <thead>
+                        <tbody>
                             <tr>
-                                <th scope="col">Playlist</th>
-                                <th scope="col">Description</th>
+                                <td>Key</td>
+                                <td>{whichKey(song.key)}</td>
                             </tr>
-                        </thead>
-                        <tbody>  
-                            {playlists.map((playlist) => 
-                                <tr key={playlist.id}>
-                                    <td>
-                                        <div className="form-check">
-                                            <input className="form-check-input" type="radio" name="song" selected={playlist.id}
-                                            onChange={(event) => setSelectedPlaylist(event.target.selected)}></input>
-                                            <label className="form-check-label">{playlist.name}</label>
-                                        </div>
-                                    </td>
-                                    <td>{playlist.description}</td>
-                                </tr>  
-                            )}
+                            <tr>
+                                <td>Mode</td>
+                                <td>{whichMode(song.mode)}</td>
+                            </tr>
+                            <tr>
+                                <td>Tempo (BPM)</td>
+                                <td>{song.tempo}</td>
+                            </tr>
+                            <tr>
+                                <td>Duration</td>
+                                <td>{song.durationMs}</td>
+                            </tr>
+                            <tr>
+                                <td>Danceability</td>
+                                <td>{song.danceability}</td>
+                            </tr>
+                            <tr>
+                                <td>Energy</td>
+                                <td>{song.energy}</td>
+                            </tr>
+                            <tr>
+                                <td>Valence</td>
+                                <td>{song.valence}</td>
+                            </tr>
+                            <tr>
+                                <td>Loudness</td>
+                                <td>{song.loudness}</td>
+                            </tr>
+                            <tr>
+                                <td>Liveness</td>
+                                <td>{song.liveness}</td>
+                            </tr>
+                            <tr>
+                                <td>Acousticness</td>
+                                <td>{song.acousticness}</td>
+                            </tr>
+                            <tr>
+                                <td>Time Signature</td>
+                                <td>{song.timeSignature}</td>
+                            </tr>
+                            <tr>
+                                <td>Speechiness</td>
+                                <td>{song.speechiness}</td>
+                            </tr>
+                            <tr>
+                                <td>Instrumentalness</td>
+                                <td>{song.instrumentalness}</td>
+                            </tr>
                         </tbody>
                     </table>
                     <div className="modal-footer">
-                        <button type="submit" className="btn btn-primary">Add to selected Playlist</button>
+                        {addMatchesModal ? <button type="button" className="btn btn-secondary" onClick={() => setIsAddToMatchesModalOpen(true)}>Add to Matches</button> : null}
+                        {addPlaylistsModal ? <button type="button" className="btn btn-primary" onClick={() => setIsAddToPlaylistsModalOpen(true)}>Add to Playlists</button> : null}
                     </div>
-                </form>
-            </Modal>
-        </div>
-    )
+                </Modal>
+                {addMatchesModal ? <AddMatches open={isAddToMatchesModalOpen} toggleCallback={setIsAddToMatchesModalOpen} song={song} /> : null}
+                {addPlaylistsModal ? <AddPlaylists open={isAddToPlaylistsModalOpen} toggleCallback={setIsAddToPlaylistsModalOpen} song={song} /> : null}
+            </>
+        )
+    }
 }
 
 export { SongDetails };

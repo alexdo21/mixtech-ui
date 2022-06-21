@@ -79,7 +79,7 @@ function Playlists() {
                                 <td><button className="btn btn-light btn-lg" selected={playlist} onClick={handleSelectedPlaylistToOpen}>{playlist.name}</button></td>
                                 <td>{playlist.description}</td>
                                 <td>
-                                    <button className="btn btn-outline-success btn-sm" value={playlist.id} onClick={handleAddOnSpotify}>Add On Spotify</button>
+                                    <button className="btn btn-outline-success btn-sm" value={playlist.id} onClick={handleAddOnSpotify}>Add on Spotify</button>
                                     <button className="btn btn-outline-danger btn-sm" value={playlist.id} onClick={handleDeletePlaylist}>X</button>
                                 </td>
                             </tr>     

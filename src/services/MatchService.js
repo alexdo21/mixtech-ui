@@ -102,15 +102,4 @@ const deleteMatch = (matchId) => {
     })
 }
 
-const addCompleteMatchToPlaylist = (matchId, playlistId) => {
-    return new Promise((resolve, reject) => {
-        REQUEST.method = "POST"
-        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
-        fetch(`${MATCH_ENDPOINT}/complete/add/playlist/${matchId}/${playlistId}`, REQUEST)
-        .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
-    })
-}
-
-export { getCompleteMatches, getIncompleteMatches, getCompleteMatchesBySongName, createMatch, pairMatch, deleteMatch, addCompleteMatchToPlaylist };
+export { getCompleteMatches, getIncompleteMatches, getCompleteMatchesBySongName, createMatch, pairMatch, deleteMatch };

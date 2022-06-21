@@ -1,7 +1,7 @@
 import React from "react";
 import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, DELETE_MATCH } from "../../reducers/types"
 import { SongDetails, SpotifyPlayer } from "../../components";
-import { getCompleteMatches, getIncompleteMatches, deleteMatch, addCompleteMatchToPlaylist } from "../../services"
+import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../services"
 import { useSelector, useDispatch } from "react-redux";
 import "./Matches.css"
 
@@ -22,9 +22,6 @@ function Matches() {
         .catch(err => console.log(err))
     }, [dispatch])
 
-    const handleAddToPlaylist = (event) => {
-
-    }
     const handleDelete = (event) => {
         const matchId = event.target.value
         deleteMatch(matchId)
@@ -61,7 +58,6 @@ function Matches() {
                                 <td><SpotifyPlayer song={match.song2} /></td>
                                 <td><button className="btn btn-light btn-lg" selected={match.song2} onClick={handleSelectedSongToOpen}>{match.song2.name}</button></td>
                                 <td>
-                                    <button className="btn btn-outline-primary btn-sm" value={match.id} onClick={handleAddToPlaylist}>{"\u2713"}</button>
                                     <button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button>
                                 </td>
                             </tr>  
@@ -92,7 +88,7 @@ function Matches() {
                     </tbody>
                 </table>
             </div>
-            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} />
+            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} addMatchesModal={false} addPlaylistsModal={true} />
         </div>
     );
 }

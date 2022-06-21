@@ -208,7 +208,7 @@ function AdvancedSearch() {
                     </tbody>
                 </table>
             </div>
-            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong}/>
+            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} addMatchesModal={true} addPlaylistsModal={true} />
         </div>
     );
 }

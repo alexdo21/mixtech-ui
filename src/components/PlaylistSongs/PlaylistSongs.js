@@ -51,7 +51,7 @@ function PlaylistSongs({playlist, open, onClose, playlistSongs}) {
                     )}
                 </tbody>
             </table>
-            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} />
+            <SongDetails open={isSongDetailsModalOpen} onClose={() => setIsSongDetailsModalOpen(false)} song={selectedSong} addMatchesModal={true} addPlaylistsModal={false} />
         </Modal>
     )
 }
