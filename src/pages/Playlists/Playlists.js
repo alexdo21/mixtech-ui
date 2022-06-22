@@ -68,6 +68,7 @@ function Playlists() {
                 <table className="table">
                     <thead>
                         <tr>
+                            <th scope="col"></th>
                             <th scope="col">Playlist</th>
                             <th scope="col">Description</th>
                             <th scope="col"></th>
@@ -76,11 +77,12 @@ function Playlists() {
                     <tbody>
                         {playlists.map((playlist) => 
                             <tr key={playlist.id}>
+                                <td></td>
                                 <td><button className="btn btn-light btn-lg" selected={playlist} onClick={handleSelectedPlaylistToOpen}>{playlist.name}</button></td>
                                 <td>{playlist.description}</td>
-                                <td>
-                                    <button className="btn btn-outline-success btn-sm" value={playlist.id} onClick={handleAddOnSpotify}>Add on Spotify</button>
+                                <td className="option-buttons">
                                     <button className="btn btn-outline-danger btn-sm" value={playlist.id} onClick={handleDeletePlaylist}>X</button>
+                                    <button className="btn btn-outline-success btn-sm" value={playlist.id} onClick={handleAddOnSpotify}>Add on Spotify</button>
                                 </td>
                             </tr>     
                         )}

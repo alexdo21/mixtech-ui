@@ -35,7 +35,7 @@ const getAllSongsInPlaylist = (playlistId) => {
                     spotifyId: song.spotifyId,
                     name: song.name,
                     albumName: song.albumName,
-                    artist: song.artistName,
+                    artistName: song.artistName,
                     danceability: song.danceability,
                     energy: song.energy,
                     key: song.key,

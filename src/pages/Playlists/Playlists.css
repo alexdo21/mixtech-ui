@@ -13,3 +13,8 @@
     padding: 50px;
     overflow: auto;
 }
+
+.option-buttons {
+    display: flex;
+    justify-content: space-evenly;
+}

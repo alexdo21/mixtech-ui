@@ -51,7 +51,7 @@ function SpotifyPlayer({ song }) {
     }
 
     return (
-        <button className="btn btn-light btn-lg" onClick={togglePlay}>{ isPlaying ? "\u23F8" : "\u25B6" }</button>
+        <button className="btn btn-light btn-lg" onClick={togglePlay}>{ isPlaying ? <i class="fa fa-pause"></i> : <i class="fa fa-play"></i> }</button>
     );
 }
 
