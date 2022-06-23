@@ -1,7 +1,7 @@
 import React from "react";
-import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, DELETE_MATCH } from "../../reducers/types"
+import { GET_COMPLETE_MATCHES, GET_INCOMPLETE_MATCHES, DELETE_MATCH, LOGOUT } from "../../reducers/types"
 import { SongDetails, SpotifyPlayer } from "../../components";
-import { getCompleteMatches, getIncompleteMatches, deleteMatch } from "../../services"
+import { getCompleteMatches, getIncompleteMatches, deleteMatch, UNAUTHORIZED } from "../../services"
 import { useSelector, useDispatch } from "react-redux";
 import "./Matches.css"
 
@@ -16,21 +16,23 @@ function Matches() {
     React.useEffect(() => {
         getCompleteMatches()
         .then(completeMatches => dispatch({ type: GET_COMPLETE_MATCHES, payload: completeMatches }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
         getIncompleteMatches()
         .then(incompleteMatches => dispatch({ type: GET_INCOMPLETE_MATCHES, payload: incompleteMatches }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }, [dispatch])
 
     const handleDelete = (event) => {
         const matchId = event.target.value
         deleteMatch(matchId)
         .then(() => dispatch({ type: DELETE_MATCH, payload: Number(matchId) }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }
     const handleSelectedSongToOpen = (event) => {
-        setSelectedSong(event.target.selected)
+        const song = event.target.selected
+        setSelectedSong(song)
         setIsSongDetailsModalOpen(true)
+        event.target.blur()
     }
 
     return (
@@ -57,9 +59,7 @@ function Matches() {
                                 <td><button className="btn btn-light btn-lg" selected={match.song1} onClick={handleSelectedSongToOpen}>{match.song1.name}</button></td>
                                 <td><SpotifyPlayer song={match.song2} /></td>
                                 <td><button className="btn btn-light btn-lg" selected={match.song2} onClick={handleSelectedSongToOpen}>{match.song2.name}</button></td>
-                                <td>
-                                    <button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button>
-                                </td>
+                                <td><button className="btn btn-outline-danger btn-sm" value={match.id} onClick={handleDelete}>X</button></td>
                             </tr>  
                         )}
                     </tbody>

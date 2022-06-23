@@ -1,4 +1,4 @@
-import { SEARCH_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from "."
+import { SEARCH_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS, UNAUTHORIZED } from "."
 
 const getSongsByQuery = (query) => {
     return new Promise((resolve, reject) => {
@@ -30,6 +30,8 @@ const getSongsByQuery = (query) => {
                     popularity: song.popularity
                 }))
                 resolve(searchResults)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -67,6 +69,8 @@ const getSongsByAudioFeatures = (advancedSearchRequest) => {
                     popularity: song.popularity
                 }))
                 resolve(searchResults)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }

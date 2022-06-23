@@ -1,17 +1,13 @@
 import React from "react";
-import Modal from "react-responsive-modal"
-import { PlaylistSongs } from "../../components"
-import { getAllPlaylists, createPlaylist, deletePlaylist, getAllSongsInPlaylist, addPlaylistOnSpotify } from "../../services"
-import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, CREATE_PLAYLIST, DELETE_PLAYLIST } from "../../reducers/types"
+import { CreatePlaylist, PlaylistSongs } from "../../components"
+import { getAllPlaylists, deletePlaylist, getAllSongsInPlaylist, addPlaylistOnSpotify, UNAUTHORIZED } from "../../services"
+import { GET_ALL_PLAYLISTS, GET_ALL_SONGS_IN_PLAYLIST, DELETE_PLAYLIST, LOGOUT } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import "./Playlists.css"
 
-
 function Playlists() {
-    const [isAddPlaylistModalOpen, setIsAddPlaylistModalOpen] = React.useState(false)
+    const [isCreatePlaylistModalOpen, setIsCreatePlaylistModalOpen] = React.useState(false)
     const [isPlaylistSongsModalOpen, setIsPlaylistSongsModalOpen] = React.useState(false)
-    const [playlistName, setPlaylistName] = React.useState("")
-    const [description, setDescription] = React.useState("")
     const [selectedPlaylist, setSelectedPlaylist] = React.useState(null)
 
     const playlists = useSelector(state => state.playlistReducer.playlists)
@@ -21,21 +17,9 @@ function Playlists() {
     React.useEffect(() => {
         getAllPlaylists()
         .then(playlists => dispatch({ type: GET_ALL_PLAYLISTS, payload: playlists }))
-        .catch(err => console.log(err))
-    }, [dispatch, isAddPlaylistModalOpen])
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+    }, [dispatch, isCreatePlaylistModalOpen])
 
-    const handleCreateNewPlaylist = (event) => {
-        event.preventDefault()
-        const newPlaylistRequest = {
-            name: playlistName,
-            description: description
-        }
-        createPlaylist(newPlaylistRequest)
-        .then(() => {
-            dispatch({ type: CREATE_PLAYLIST })
-            setIsAddPlaylistModalOpen(false)
-        }).catch(err => console.log(err))
-    }
     const handleSelectedPlaylistToOpen = (event) => {
         const selectedPlaylist = event.target.selected
         getAllSongsInPlaylist(selectedPlaylist.id)
@@ -43,26 +27,32 @@ function Playlists() {
             dispatch({ type: GET_ALL_SONGS_IN_PLAYLIST, payload: playlistSongs })
             setSelectedPlaylist(selectedPlaylist)
             setIsPlaylistSongsModalOpen(true)
-        }).catch(err => console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+        event.target.blur()
     }
     const handleAddOnSpotify = (event) => {
         const playlistId = event.target.value
         addPlaylistOnSpotify(playlistId)
         .then(() => alert("Playlist added on spotify succesfully"))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+        event.target.blur()
     }
     const handleDeletePlaylist = (event) => {
         const playlistId = event.target.value
         deletePlaylist(playlistId)
         .then(() => dispatch({ type: DELETE_PLAYLIST, payload: Number(playlistId) }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+    }
+    const handleOpenAddPlaylistModal = (event) => {
+        setIsCreatePlaylistModalOpen(true)
+        event.target.blur()
     }
 
     return (
         <div id="playlistContent">
             <div id="playlistTitle">
                 <h1>My Playlists</h1>
-                <button className="btn btn-outline-primary btn-sm" onClick={() => setIsAddPlaylistModalOpen(true)}>Add Playlist</button>
+                <button className="btn btn-outline-primary btn-sm" onClick={handleOpenAddPlaylistModal}>Add Playlist</button>
             </div>
             <div id="playlistTable">
                 <table className="table">
@@ -89,22 +79,8 @@ function Playlists() {
                     </tbody>
                 </table>
             </div>
-            <Modal open={isAddPlaylistModalOpen} onClose={() => setIsAddPlaylistModalOpen(false)}>
-                <div className="container">
-                    <form onSubmit={handleCreateNewPlaylist}>
-                        <div className="form-group">
-                            <label>Playlist Name</label>
-                            <input type="text" className="form-control" name="playlistName" onChange={(event) => setPlaylistName(event.target.value)}></input>
-                        </div>
-                        <div className="form-group">
-                            <label>Description</label>
-                            <textarea className="form-control" name="description" onChange={(event) => setDescription(event.target.value)}></textarea>
-                        </div>
-                        <button type="submit" className="btn btn-primary">Add Playlist</button>
-                    </form>
-                </div>
-            </Modal>
-            <PlaylistSongs open={isPlaylistSongsModalOpen} onClose={() => setIsPlaylistSongsModalOpen(false)} playlist={selectedPlaylist} playlistSongs={playlistSongs}/>
+            <CreatePlaylist open={isCreatePlaylistModalOpen} onClose={() => setIsCreatePlaylistModalOpen(false)} />
+            <PlaylistSongs open={isPlaylistSongsModalOpen} onClose={() => setIsPlaylistSongsModalOpen(false)} playlist={selectedPlaylist} playlistSongs={playlistSongs} />
         </div>
     );
 }

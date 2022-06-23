@@ -1,4 +1,4 @@
-import { PLAYLIST_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from ".";
+import { PLAYLIST_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS, UNAUTHORIZED } from ".";
 
 const getAllPlaylists = () => {
     return new Promise((resolve, reject) => {
@@ -15,6 +15,8 @@ const getAllPlaylists = () => {
                     description: playlist.description
                 }));
                 resolve(results)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -52,6 +54,8 @@ const getAllSongsInPlaylist = (playlistId) => {
                     popularity: song.popularity
                 }))
                 resolve(songs)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -66,8 +70,15 @@ const createPlaylist = (newPlaylistRequest) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/create`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -77,8 +88,15 @@ const addSongToPlaylist = (playlistId, songId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/songs/add/${playlistId}?songId=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -88,8 +106,15 @@ const deleteSongFromPlaylist = (playlistId, songId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/songs/delete/${playlistId}?songId=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -99,8 +124,15 @@ const deletePlaylist = (playlistId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/delete/${playlistId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -110,8 +142,15 @@ const addPlaylistOnSpotify = (playlistId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${PLAYLIST_ENDPOINT}/add/spotify/${playlistId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 

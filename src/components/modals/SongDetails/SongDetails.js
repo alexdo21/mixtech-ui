@@ -1,12 +1,21 @@
 import React from "react";
 import Modal from "react-responsive-modal"
-import { AddMatches, AddPlaylists } from "../"
-import { whichKey, whichMode } from "../../services"
+import { AddToMatches, AddToPlaylists } from "../.."
+import { whichKey, whichMode } from "../../../services"
 import "./SongDetails.css"
 
 function SongDetails({open, onClose, song, addMatchesModal, addPlaylistsModal}) {
     const [isAddToMatchesModalOpen, setIsAddToMatchesModalOpen] = React.useState(false)
     const [isAddToPlaylistsModalOpen, setIsAddToPlaylistsModalOpen] = React.useState(false)
+
+    const handleOpenAddToMatchesModal = (event) => {
+        setIsAddToMatchesModalOpen(true)
+        event.target.blur()
+    }
+    const handleOpenAddToPlaylistsModal = (event) => {
+        setIsAddToPlaylistsModalOpen(true)
+        event.target.blur()
+    }
 
     if (song != null) {
         return (
@@ -81,13 +90,13 @@ function SongDetails({open, onClose, song, addMatchesModal, addPlaylistsModal}) 
                             </tbody>
                         </table>
                         <div className="modal-footer">
-                            {addMatchesModal ? <button type="button" className="btn btn-secondary" onClick={() => setIsAddToMatchesModalOpen(true)}>Add to Matches</button> : null}
-                            {addPlaylistsModal ? <button type="button" className="btn btn-primary" onClick={() => setIsAddToPlaylistsModalOpen(true)}>Add to Playlists</button> : null}
+                            {addMatchesModal ? <button type="button" className="btn btn-secondary shadow-none" onClick={handleOpenAddToMatchesModal}>Add to Matches</button> : null}
+                            {addPlaylistsModal ? <button type="button" className="btn btn-primary shadow-none" onClick={handleOpenAddToPlaylistsModal}>Add to Playlists</button> : null}
                         </div>
                     </div>
                 </Modal>
-                {addMatchesModal ? <AddMatches open={isAddToMatchesModalOpen} toggleCallback={setIsAddToMatchesModalOpen} song={song} /> : null}
-                {addPlaylistsModal ? <AddPlaylists open={isAddToPlaylistsModalOpen} toggleCallback={setIsAddToPlaylistsModalOpen} song={song} /> : null}
+                {addMatchesModal ? <AddToMatches open={isAddToMatchesModalOpen} toggleCallback={setIsAddToMatchesModalOpen} song={song} /> : null}
+                {addPlaylistsModal ? <AddToPlaylists open={isAddToPlaylistsModalOpen} toggleCallback={setIsAddToPlaylistsModalOpen} song={song} /> : null}
             </>
         )
     }

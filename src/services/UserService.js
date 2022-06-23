@@ -1,4 +1,4 @@
-import { USER_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from "."
+import { USER_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS, UNAUTHORIZED } from "."
 
 const getUserInfo = () => {
     return new Promise((resolve, reject) => {
@@ -11,6 +11,8 @@ const getUserInfo = () => {
             if (res.status === SUCCESS) {
                 const user = res.user
                 resolve(user)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -29,6 +31,8 @@ const getUserAccessToken = () => {
             if (res.status === SUCCESS) {
                 const accessToken = res.accessToken
                 resolve(accessToken)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -42,8 +46,15 @@ const startSong = (songId, deviceId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${USER_ENDPOINT}/player/start/${songId}/${deviceId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -64,16 +75,16 @@ const pauseSong = (deviceId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${USER_ENDPOINT}/player/pause/${deviceId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
-const logout = () => {
-    return new Promise((resolve, reject) => {
-        localStorage.removeItem(ACCESS_TOKEN)
-        resolve()
-    })
-}
-
-export { getUserInfo, getUserAccessToken, startSong, resumeSong, pauseSong, logout };
+export { getUserInfo, getUserAccessToken, startSong, resumeSong, pauseSong };

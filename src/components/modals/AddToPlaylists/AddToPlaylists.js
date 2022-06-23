@@ -1,10 +1,10 @@
 import React from 'react';
 import Modal from "react-responsive-modal"
-import { getAllPlaylists, addSongToPlaylist } from "../../services"
-import { GET_ALL_PLAYLISTS, ADD_SONG_TO_PLAYLIST } from "../../reducers/types"
+import { getAllPlaylists, addSongToPlaylist, UNAUTHORIZED } from "../../../services"
+import { GET_ALL_PLAYLISTS, ADD_SONG_TO_PLAYLIST, LOGOUT } from "../../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 
-function AddPlaylists({open, toggleCallback, song}) {
+function AddToPlaylists({open, toggleCallback, song}) {
     const [selectedPlaylist, setSelectedPlaylist] = React.useState(-1)
 
     const playlists = useSelector(state => state.playlistReducer.playlists)
@@ -13,7 +13,7 @@ function AddPlaylists({open, toggleCallback, song}) {
     React.useEffect(() => {
         getAllPlaylists()
         .then(playlists => dispatch({ type: GET_ALL_PLAYLISTS, payload: playlists }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }, [dispatch])
 
     const handleAddSongToPlaylist = (event) => {
@@ -22,7 +22,7 @@ function AddPlaylists({open, toggleCallback, song}) {
         .then(() => {
             dispatch({ type: ADD_SONG_TO_PLAYLIST })
             toggleCallback(false)
-        }).catch(err => console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }
 
     return (
@@ -61,4 +61,4 @@ function AddPlaylists({open, toggleCallback, song}) {
     );
 }
 
-export { AddPlaylists };
+export { AddToPlaylists };

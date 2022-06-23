@@ -1,9 +1,9 @@
 import React from 'react';
-import { startSong, resumeSong, pauseSong } from "../../services"
-import { SWITCH_SONG } from '../../reducers/types';
+import { startSong, resumeSong, pauseSong, UNAUTHORIZED } from "../../services"
+import { SWITCH_SONG, LOGOUT } from '../../reducers/types';
 import { useSelector, useDispatch } from "react-redux";
 
-function SpotifyPlayer({ song }) {
+function SpotifyPlayer({song}) {
     const [isPlaying, setIsPlaying] = React.useState(false)
     const [started, setStarted] = React.useState(false)
 
@@ -16,16 +16,16 @@ function SpotifyPlayer({ song }) {
             setStarted(false)
             setIsPlaying(false)
         }
-    }, [currentSong])
+    }, [currentSong, song])
 
     React.useEffect(() => {
         return () => {
             pauseSong(deviceId)
-            .catch(err => console.log(err))
+            .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
         }
-    }, [deviceId])
+    }, [deviceId, dispatch])
 
-    const togglePlay = () => {
+    const togglePlay = (event) => {
         const songId = song.spotifyId
         if (!started) {
             console.log("Starting ", song.name, song.spotifyId)
@@ -34,24 +34,25 @@ function SpotifyPlayer({ song }) {
                 dispatch({ type: SWITCH_SONG, payload: songId })
                 setIsPlaying(true)
                 setStarted(true)
-            }).catch(err => console.log(err))
+            }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
         } else {
             if (isPlaying) {
                 console.log("Pausing  ", song.name)
                 pauseSong(deviceId)
                 .then(() => setIsPlaying(false))
-                .catch(err => console.log(err))
+                .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
             } else {
                 console.log("Resuming  ", song.name)
                 resumeSong(deviceId)
                 .then(() => setIsPlaying(true))
-                .catch(err => console.log(err))
+                .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
             }
         }
+        event.target.blur()
     }
 
     return (
-        <button className="btn btn-light btn-lg" onClick={togglePlay}>{ isPlaying ? <i class="fa fa-pause"></i> : <i class="fa fa-play"></i> }</button>
+        <button className="btn btn-light btn-lg shadow-none" onClick={togglePlay}>{ isPlaying ? <i className="fa fa-pause"></i> : <i className="fa fa-play"></i> }</button>
     );
 }
 

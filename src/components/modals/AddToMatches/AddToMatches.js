@@ -1,11 +1,11 @@
 import React from 'react';
 import Modal from "react-responsive-modal"
-import { getIncompleteMatches, createMatch, pairMatch } from "../../services"
-import { GET_INCOMPLETE_MATCHES, CREATE_MATCH, PAIR_MATCH } from "../../reducers/types"
+import { getIncompleteMatches, createMatch, pairMatch, UNAUTHORIZED } from "../../../services"
+import { GET_INCOMPLETE_MATCHES, CREATE_MATCH, PAIR_MATCH, LOGOUT } from "../../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 
 
-function AddMatches({open, toggleCallback, song}) {
+function AddToMatches({open, toggleCallback, song}) {
     const [selectedMatch, setSelectedMatch] = React.useState(-1)
 
     const incompleteMatches = useSelector(state => state.matchReducer.incompleteMatches)
@@ -14,7 +14,7 @@ function AddMatches({open, toggleCallback, song}) {
     React.useEffect(() => {
         getIncompleteMatches()
         .then(incompleteMatches => dispatch({ type: GET_INCOMPLETE_MATCHES, payload: incompleteMatches }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }, [dispatch, open])
 
     const handleCreateNewMatch = () => {
@@ -22,7 +22,7 @@ function AddMatches({open, toggleCallback, song}) {
         .then(() => {
             dispatch({ type: CREATE_MATCH })
             toggleCallback(false)
-        }).catch(err => console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }
     const handlePairMatch = (event) => {
         event.preventDefault()
@@ -30,7 +30,7 @@ function AddMatches({open, toggleCallback, song}) {
         .then(() => {
             dispatch({ type: PAIR_MATCH })
             toggleCallback(false)
-        }).catch(err => console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }
 
     return (
@@ -70,4 +70,4 @@ function AddMatches({open, toggleCallback, song}) {
     );
 }
 
-export { AddMatches };
+export { AddToMatches };

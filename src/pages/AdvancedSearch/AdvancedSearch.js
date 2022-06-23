@@ -1,7 +1,7 @@
 import React from "react";
 import { SongDetails, SpotifyPlayer } from "../../components"
-import { getSongsByAudioFeatures, whichKey, whichMode } from "../../services"
-import { GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS } from "../../reducers/types"
+import { getSongsByAudioFeatures, whichKey, whichMode, UNAUTHORIZED } from "../../services"
+import { GET_SONGS_BY_AUDIO_FEATURES, CLEAR_SEARCH_RESULTS, LOGOUT } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import InputRange from "react-input-range"
 import "react-input-range/lib/css/index.css"
@@ -47,11 +47,13 @@ function AdvancedSearch() {
         }
         getSongsByAudioFeatures(advancedSearchRequest)
         .then(searchResults => dispatch({ type: GET_SONGS_BY_AUDIO_FEATURES, payload: searchResults }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }
     const handleSelectedSongToOpen = (event) => {
-        setSelectedSong(event.target.selected)
+        const song = event.target.selected
+        setSelectedSong(song)
         setIsSongDetailsModalOpen(true)
+        event.target.blur()
     }
 
     return (

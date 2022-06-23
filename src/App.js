@@ -6,10 +6,6 @@ import "./App.css"
 import { Front, Home } from "./pages"
 import { PrivateRoute, OAuth2RedirectHandler } from "./components"
 
-/**
- * Starting point of MixTech. Defines browser routes through React Router.
- * Each route redirects the user to the corresponding component upon navigating to it.
- */
 
 function App() {
   return (

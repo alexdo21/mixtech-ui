@@ -1,6 +1,5 @@
 import React from "react";
 import { Link } from "react-router-dom"
-import { logout } from "../../services"
 import { LOGOUT } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import "./Sidebar.css"
@@ -11,8 +10,7 @@ function Sidebar() {
     const dispatch = useDispatch()
 
     const handleLogout = () => {
-        logout()
-        .then(() => dispatch({ type: LOGOUT }))
+        dispatch({ type: LOGOUT })
     }
 
     return (

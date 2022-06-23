@@ -1,4 +1,4 @@
-import { MATCH_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS } from "."
+import { MATCH_ENDPOINT, REQUEST, ACCESS_TOKEN, SUCCESS, UNAUTHORIZED } from "."
 
 const getCompleteMatches = () => {
     return new Promise((resolve, reject) => {
@@ -15,6 +15,8 @@ const getCompleteMatches = () => {
                     song2: match.song2
                 }))
                 resolve(completeMatches)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -38,6 +40,8 @@ const getIncompleteMatches = () => {
                     song2: match.song2
                 }))
                 resolve(incompleteMatches)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -61,6 +65,8 @@ const getIncompleteMatches = () => {
                     song2: match.song2
                 }))
                 resolve(matches)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
             } else {
                 reject(res.errorMessage)
             }
@@ -75,8 +81,15 @@ const createMatch = (songId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${MATCH_ENDPOINT}/create/?songId1=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -86,8 +99,15 @@ const pairMatch = (matchId, songId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${MATCH_ENDPOINT}/pair/${matchId}?songId2=${songId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 
@@ -97,8 +117,15 @@ const deleteMatch = (matchId) => {
         REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
         fetch(`${MATCH_ENDPOINT}/delete/${matchId}`, REQUEST)
         .then(res => res.json())
-        .then(res => res.status === SUCCESS ? resolve() : reject(res.errorMessage))
-        .catch(err => reject(err))
+        .then(res => {
+            if (res.status === SUCCESS) {
+                resolve()
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
     })
 }
 

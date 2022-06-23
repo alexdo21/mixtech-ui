@@ -1,7 +1,7 @@
 import React from "react";
 import { SongDetails, SpotifyPlayer } from "../../components"
-import { getSongsByQuery, getCompleteMatchesBySongName, whichKey, whichMode } from "../../services"
-import { GET_SONGS_BY_QUERY, CLEAR_SEARCH_RESULTS, GET_COMPLETE_MATCHES_BY_SONG_NAME } from "../../reducers/types"
+import { getSongsByQuery, getCompleteMatchesBySongName, whichKey, whichMode, UNAUTHORIZED } from "../../services"
+import { GET_SONGS_BY_QUERY, CLEAR_SEARCH_RESULTS, GET_COMPLETE_MATCHES_BY_SONG_NAME, LOGOUT } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import "./Search.css"
 
@@ -23,14 +23,16 @@ function Search() {
         event.preventDefault()
         getSongsByQuery(query)
         .then(searchResults => dispatch({ type: GET_SONGS_BY_QUERY, payload: searchResults }))
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
         getCompleteMatchesBySongName(query)
         .then(searchMatches => dispatch({ type: GET_COMPLETE_MATCHES_BY_SONG_NAME, payload: searchMatches }) )
-        .catch(err => console.log(err))
+        .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
     }
     const handleSelectedSongToOpen = (event) => {
-        setSelectedSong(event.target.selected)
+        const song = event.target.selected
+        setSelectedSong(song)
         setIsSongDetailsModalOpen(true)
+        event.target.blur()
     }
     
     return (

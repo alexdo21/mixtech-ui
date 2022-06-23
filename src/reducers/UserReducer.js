@@ -1,9 +1,10 @@
+import { ACCESS_TOKEN } from "../services"
 import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, GET_USER_INFO, SPOTIFY_PLAYER_READY, SPOTIFY_PLAYER_NOT_READY, SWITCH_SONG, LOGOUT } from "./types"
 
 
 const initialState = {
     isFetching: false,
-    isAuthenticated: false,
+    isAuthenticated: localStorage.getItem(ACCESS_TOKEN) ? true : false,
     user: null,
     deviceId: null,
     currentSong: null
@@ -48,6 +49,7 @@ export const UserReducer = (state=initialState, action) => {
                 currentSong: action.payload
             }
         case LOGOUT:
+            localStorage.removeItem(ACCESS_TOKEN)
             return {
                 ...state,
                 isFetching: false,

@@ -3,14 +3,17 @@ import { Sidebar } from "../../components"
 import { Matches, Playlists, Search, AdvancedSearch } from "../"
 import { getUserInfo, getUserAccessToken } from "../../services";
 import { GET_USER_INFO, SPOTIFY_PLAYER_READY, SPOTIFY_PLAYER_NOT_READY } from "../../reducers/types"
-import { useSelector, useDispatch } from "react-redux";
-import { Routes, Route } from "react-router-dom"
-import { Navigate } from "react-router"
+import { useDispatch } from "react-redux";
+import { Routes, Route, useNavigate } from "react-router-dom"
 import "./Home.css"
 
 function Home() {
-    const isAuthenticated = useSelector(state => state.userReducer.isAuthenticated)
     const dispatch = useDispatch()
+    const navigate = useNavigate()
+
+    React.useEffect(() => {
+        console.log("Changed")
+    }, [navigate])
 
     React.useEffect(() => {
         getUserInfo()
