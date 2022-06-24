@@ -1,9 +1,6 @@
 import React from "react"
-import { useSelector } from "react-redux"
-import { Navigate } from "react-router"
 
 function Front() {
-    const isAuthenticated = useSelector(state => state.userReducer.isAuthenticated);
     return (
         <div className="container" style={parentStyle}>
             <div className="container" style={style}>

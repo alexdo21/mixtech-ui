@@ -2,6 +2,7 @@ import React from 'react'
 import { Navigate, useLocation } from 'react-router';
 import { useSelector, useDispatch } from "react-redux"
 import { LOGIN_SUCCESS, LOGIN_FAILURE } from "../../reducers/types"
+import { ACCESS_TOKEN } from '../../services';
 
 function OAuth2RedirectHandler() {
     const location = useLocation()
@@ -18,7 +19,7 @@ function OAuth2RedirectHandler() {
         const token = getUrlParameter("token")
         const error = getUrlParameter("error")
         if (token) {
-            localStorage.setItem("access_token", token)
+            localStorage.setItem(ACCESS_TOKEN, token)
             dispatch({ type: LOGIN_SUCCESS })
         } else {
             dispatch({ type: LOGIN_FAILURE, error: error })

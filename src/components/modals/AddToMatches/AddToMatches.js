@@ -4,7 +4,6 @@ import { getIncompleteMatches, createMatch, pairMatch, UNAUTHORIZED } from "../.
 import { GET_INCOMPLETE_MATCHES, CREATE_MATCH, PAIR_MATCH, LOGOUT } from "../../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 
-
 function AddToMatches({open, toggleCallback, song}) {
     const [selectedMatch, setSelectedMatch] = React.useState(-1)
 

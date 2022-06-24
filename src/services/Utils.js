@@ -1,3 +1,12 @@
+import { ACCESS_TOKEN } from "."
+
+export const getTokenExpiryTime = () => {
+    const jwt = localStorage.getItem(ACCESS_TOKEN)
+    const payload = JSON.parse(atob(jwt.split(".")[1]))
+    const expiration = new Date(payload.exp * 1000)
+    return expiration.getTime()
+}
+
 export const whichKey = (value) => {
     switch(value) {
         case 0: return "C"

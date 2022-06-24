@@ -1,5 +1,5 @@
 import React from 'react';
-import { startSong, resumeSong, pauseSong, UNAUTHORIZED } from "../../services"
+import { startSong, resumeSong, pauseSong, UNAUTHORIZED, ACCESS_TOKEN } from "../../services"
 import { SWITCH_SONG, LOGOUT } from '../../reducers/types';
 import { useSelector, useDispatch } from "react-redux";
 
@@ -20,10 +20,13 @@ function SpotifyPlayer({song}) {
 
     React.useEffect(() => {
         return () => {
-            pauseSong(deviceId)
-            .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+            if (localStorage.getItem(ACCESS_TOKEN) && currentSong) {
+                pauseSong(deviceId)
+                .then(() => setIsPlaying(false))
+                .catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+            }
         }
-    }, [deviceId, dispatch])
+    }, [currentSong, deviceId, dispatch])
 
     const togglePlay = (event) => {
         const songId = song.spotifyId

@@ -1,19 +1,14 @@
 import React from "react";
-import { Sidebar } from "../../components"
+import { Sidebar, SessionTimeout } from "../../components"
 import { Matches, Playlists, Search, AdvancedSearch } from "../"
 import { getUserInfo, getUserAccessToken } from "../../services";
 import { GET_USER_INFO, SPOTIFY_PLAYER_READY, SPOTIFY_PLAYER_NOT_READY } from "../../reducers/types"
 import { useDispatch } from "react-redux";
-import { Routes, Route, useNavigate } from "react-router-dom"
+import { Routes, Route } from "react-router-dom"
 import "./Home.css"
 
 function Home() {
     const dispatch = useDispatch()
-    const navigate = useNavigate()
-
-    React.useEffect(() => {
-        console.log("Changed")
-    }, [navigate])
 
     React.useEffect(() => {
         getUserInfo()
@@ -28,8 +23,9 @@ function Home() {
 
         document.body.appendChild(script);
         
+        var player;
         window.onSpotifyWebPlaybackSDKReady = () => {
-            const player = new window.Spotify.Player({
+            player = new window.Spotify.Player({
                 name: "MixTech Player",
                 getOAuthToken: callback => {
                     getUserAccessToken()
@@ -53,6 +49,7 @@ function Home() {
             });
             player.connect();
         };
+        return () => { if (player) player.disconnect() }
     }, [dispatch])
 
     return (
@@ -65,6 +62,7 @@ function Home() {
                 <Route path="/search" element={<Search />} />
                 <Route path="/advancedsearch" element={<AdvancedSearch />} />
             </Routes>
+            <SessionTimeout />
         </div>
     )
 }

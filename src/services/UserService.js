@@ -40,6 +40,26 @@ const getUserAccessToken = () => {
     })
 }
 
+const getRefreshToken = () => {
+    return new Promise((resolve, reject) => {
+        REQUEST.method = "GET"
+        REQUEST.headers["Authorization"] = `Bearer ${localStorage.getItem(ACCESS_TOKEN)}`
+        delete REQUEST.body
+        fetch(`${USER_ENDPOINT}/refresh-token`, REQUEST)
+        .then(res => res.json())
+        .then(res => {
+            if (res.status === SUCCESS) {
+                const accessToken = res.accessToken
+                resolve(accessToken)
+            } else if (res.status === UNAUTHORIZED) {
+                reject(UNAUTHORIZED)
+            } else {
+                reject(res.errorMessage)
+            }
+        }).catch(err => reject(err))
+    })
+}
+
 const startSong = (songId, deviceId) => {
     return new Promise((resolve, reject) => {
         REQUEST.method = "POST"
@@ -87,4 +107,4 @@ const pauseSong = (deviceId) => {
     })
 }
 
-export { getUserInfo, getUserAccessToken, startSong, resumeSong, pauseSong };
+export { getUserInfo, getUserAccessToken, getRefreshToken, startSong, resumeSong, pauseSong };

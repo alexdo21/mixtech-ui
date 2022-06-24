@@ -20,5 +20,5 @@ export { MATCH_ENDPOINT, PLAYLIST_ENDPOINT, SEARCH_ENDPOINT, USER_ENDPOINT, REQU
 export { getCompleteMatches, getIncompleteMatches, getCompleteMatchesBySongName, createMatch, pairMatch, deleteMatch } from "./MatchService"
 export { getAllPlaylists, getAllSongsInPlaylist, createPlaylist, addSongToPlaylist, deleteSongFromPlaylist, deletePlaylist, addPlaylistOnSpotify } from "./PlaylistService"
 export { getSongsByQuery, getSongsByAudioFeatures } from "./SearchService"
-export { getUserInfo, getUserAccessToken, startSong, resumeSong, pauseSong } from "./UserService"
-export { whichKey, whichMode } from "./Utils"
+export { getUserInfo, getUserAccessToken, getRefreshToken, startSong, resumeSong, pauseSong } from "./UserService"
+export { getTokenExpiryTime, whichKey, whichMode } from "./Utils"

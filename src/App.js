@@ -1,6 +1,5 @@
 import React from "react"
 import { BrowserRouter, Routes, Route } from "react-router-dom"
-import { connect } from "react-redux";
 
 import "./App.css"
 import { Front, Home } from "./pages"
@@ -21,4 +20,4 @@ function App() {
   );
 }
 
-export default connect()(App);
+export default App;
