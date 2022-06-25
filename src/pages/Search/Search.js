@@ -1,6 +1,6 @@
 import React from "react";
 import { SongDetails, SpotifyPlayer } from "../../components"
-import { getSongsByQuery, getCompleteMatchesBySongName, whichKey, whichMode, UNAUTHORIZED } from "../../services"
+import { getSongsByQuery, getCompleteMatchesBySongName, whichKey, whichMode, round2, UNAUTHORIZED } from "../../services"
 import { GET_SONGS_BY_QUERY, CLEAR_SEARCH_RESULTS, GET_COMPLETE_MATCHES_BY_SONG_NAME, LOGOUT } from "../../reducers/types"
 import { useSelector, useDispatch } from "react-redux";
 import "./Search.css"
@@ -66,7 +66,7 @@ function Search() {
                                 <td><button className="btn btn-light btn-lg" selected={song} onClick={handleSelectedSongToOpen}>{song.name}</button></td>
                                 <td>{song.artistName}</td>
                                 <td>{whichKey(song.key)} {whichMode(song.mode)}</td>
-                                <td>{song.tempo}</td>
+                                <td>{round2(song.tempo)}</td>
                                 <td>{song.popularity}</td>
                             </tr>
                         )}

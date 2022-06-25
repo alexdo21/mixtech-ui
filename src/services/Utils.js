@@ -32,3 +32,11 @@ export const whichMode = (value) => {
         default: return ""
     }
 }
+
+export const round2 = (num) => {
+    return Math.round((num + Number.EPSILON) * 100) / 100
+}
+
+export const minuteSeconds = (milliSeconds) => {
+    return `${Math.floor((milliSeconds / 1000) / 60)}:${String(Math.floor(milliSeconds / 1000) % 60).padStart(2, "0")}`
+}

@@ -22,7 +22,7 @@ function AddToPlaylists({open, toggleCallback, song}) {
         .then(() => {
             dispatch({ type: ADD_SONG_TO_PLAYLIST })
             toggleCallback(false)
-        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : alert(err))
     }
 
     return (

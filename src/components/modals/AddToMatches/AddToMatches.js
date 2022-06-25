@@ -21,7 +21,7 @@ function AddToMatches({open, toggleCallback, song}) {
         .then(() => {
             dispatch({ type: CREATE_MATCH })
             toggleCallback(false)
-        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : alert(err))
     }
     const handlePairMatch = (event) => {
         event.preventDefault()
@@ -29,7 +29,7 @@ function AddToMatches({open, toggleCallback, song}) {
         .then(() => {
             dispatch({ type: PAIR_MATCH })
             toggleCallback(false)
-        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : console.log(err))
+        }).catch(err => err === UNAUTHORIZED ? dispatch({ type: LOGOUT }) : alert(err))
     }
 
     return (

@@ -49,7 +49,7 @@ const getAllSongsInPlaylist = (playlistId) => {
                     liveness: song.liveness,
                     valence: song.valence,
                     tempo: song.tempo,
-                    duration: song.durationMs,
+                    durationMs: song.durationMs,
                     timeSignature: song.timeSignature,
                     popularity: song.popularity
                 }))

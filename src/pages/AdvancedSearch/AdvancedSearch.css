@@ -21,10 +21,15 @@
 }
 .pcol {
     padding: 15px;
-    margin-left: 5px;
-    margin-right: 5px;
+    margin-left: 20px;
+    margin-right: 20px;
 }
   
 .input-range {
     margin-bottom: 50px;
+}
+
+.input-range__label--min,
+.input-range__label--max {
+  color: transparent
 }

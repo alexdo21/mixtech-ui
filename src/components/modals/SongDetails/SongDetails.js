@@ -1,7 +1,7 @@
 import React from "react";
 import Modal from "react-responsive-modal"
 import { AddToMatches, AddToPlaylists } from "../.."
-import { whichKey, whichMode } from "../../../services"
+import { whichKey, whichMode, round2, minuteSeconds } from "../../../services"
 import "./SongDetails.css"
 
 function SongDetails({open, onClose, song, addMatchesModal, addPlaylistsModal}) {
@@ -44,48 +44,48 @@ function SongDetails({open, onClose, song, addMatchesModal, addPlaylistsModal}) 
                                     <td>{whichMode(song.mode)}</td>
                                 </tr>
                                 <tr>
+                                    <td>Time Signature</td>
+                                    <td>{`${song.timeSignature}/4`}</td>
+                                </tr>
+                                <tr>
                                     <td>Tempo (BPM)</td>
-                                    <td>{song.tempo}</td>
+                                    <td>{round2(song.tempo)}</td>
                                 </tr>
                                 <tr>
                                     <td>Duration</td>
-                                    <td>{song.durationMs}</td>
+                                    <td>{minuteSeconds(song.durationMs)}</td>
                                 </tr>
                                 <tr>
                                     <td>Danceability</td>
-                                    <td>{song.danceability}</td>
+                                    <td>{round2(song.danceability)}</td>
                                 </tr>
                                 <tr>
                                     <td>Energy</td>
-                                    <td>{song.energy}</td>
+                                    <td>{round2(song.energy)}</td>
                                 </tr>
                                 <tr>
                                     <td>Valence</td>
-                                    <td>{song.valence}</td>
+                                    <td>{round2(song.valence)}</td>
                                 </tr>
                                 <tr>
                                     <td>Loudness</td>
-                                    <td>{song.loudness}</td>
+                                    <td>{round2(song.loudness)}</td>
                                 </tr>
                                 <tr>
                                     <td>Liveness</td>
-                                    <td>{song.liveness}</td>
+                                    <td>{round2(song.liveness)}</td>
                                 </tr>
                                 <tr>
                                     <td>Acousticness</td>
-                                    <td>{song.acousticness}</td>
-                                </tr>
-                                <tr>
-                                    <td>Time Signature</td>
-                                    <td>{song.timeSignature}</td>
+                                    <td>{round2(song.acousticness)}</td>
                                 </tr>
                                 <tr>
                                     <td>Speechiness</td>
-                                    <td>{song.speechiness}</td>
+                                    <td>{round2(song.speechiness)}</td>
                                 </tr>
                                 <tr>
                                     <td>Instrumentalness</td>
-                                    <td>{song.instrumentalness}</td>
+                                    <td>{round2(song.instrumentalness)}</td>
                                 </tr>
                             </tbody>
                         </table>

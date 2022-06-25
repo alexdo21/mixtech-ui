@@ -11,8 +11,6 @@ function PlaylistSongs({playlist, open, onClose, playlistSongs}) {
 
     const dispatch = useDispatch()
 
-    React.useEffect(() => {}, [playlistSongs])
-
     const handleSelectedSongToOpen = (event) => {
         const song = event.target.selected
         setSelectedSong(song)

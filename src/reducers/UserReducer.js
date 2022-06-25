@@ -1,9 +1,8 @@
 import { ACCESS_TOKEN } from "../services"
-import { LOGIN_REQUEST, LOGIN_SUCCESS, LOGIN_FAILURE, GET_USER_INFO, SPOTIFY_PLAYER_READY, SPOTIFY_PLAYER_NOT_READY, SWITCH_SONG, LOGOUT } from "./types"
+import { LOGIN_SUCCESS, LOGIN_FAILURE, GET_USER_INFO, SPOTIFY_PLAYER_READY, SPOTIFY_PLAYER_NOT_READY, SWITCH_SONG, LOGOUT } from "./types"
 
 
 const initialState = {
-    isFetching: false,
     isAuthenticated: localStorage.getItem(ACCESS_TOKEN) ? true : false,
     user: null,
     deviceId: null,
@@ -12,21 +11,15 @@ const initialState = {
 
 export const UserReducer = (state=initialState, action) => {
     switch (action.type) {
-        case LOGIN_REQUEST:
-            return {
-                ...state,
-                isFetching: true,
-            }
         case LOGIN_SUCCESS:
             return {
                 ...state,
-                isFetching: false,
                 isAuthenticated: true,
             }
         case LOGIN_FAILURE:
             return {
                 ...state,
-                isFetching: false,
+                isAuthenticated: false,
             }
         case GET_USER_INFO:
             return {
@@ -52,7 +45,6 @@ export const UserReducer = (state=initialState, action) => {
             localStorage.removeItem(ACCESS_TOKEN)
             return {
                 ...state,
-                isFetching: false,
                 isAuthenticated: false
             }
         default:

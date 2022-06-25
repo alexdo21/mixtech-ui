@@ -22,7 +22,8 @@ function OAuth2RedirectHandler() {
             localStorage.setItem(ACCESS_TOKEN, token)
             dispatch({ type: LOGIN_SUCCESS })
         } else {
-            dispatch({ type: LOGIN_FAILURE, error: error })
+            alert(error)
+            dispatch({ type: LOGIN_FAILURE })
         }
     }, [location, dispatch])
     

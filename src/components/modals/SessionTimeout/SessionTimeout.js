@@ -11,14 +11,9 @@ function SessionTimeout() {
     const FIVE_MINUTES = ONE_MINUTE * 5
 
     const [expiryTime, setExpiryTime] = React.useState(getTokenExpiryTime())
-    const [timeElapsed, setTimeElapsed] = React.useState(0)
     const [timeRemaining, setTimeRemaining] = React.useState(0)
     const [isSessionTimeoutModalOpen, setIsSessionTimeoutModalOpen] = React.useState(false)
     const dispatch = useDispatch()
-
-    const handleOnIdle = () => {
-        console.log("idle")
-    }
 
     const handleStayLoggedIn = React.useCallback(() => {
         getRefreshToken()
@@ -35,15 +30,10 @@ function SessionTimeout() {
         dispatch({ type: LOGOUT })
     }, [dispatch])
 
-    const {isIdle} = useIdleTimer({
-        onIdle: handleOnIdle,
-        timeout: FIVE_MINUTES
-    })
+    const {isIdle} = useIdleTimer({timeout: FIVE_MINUTES})
 
     React.useEffect(() => {
         const interval = setInterval(() => {
-            setTimeElapsed(timeElapsed + 1)
-            console.log(timeElapsed)
             const now = new Date()
             const tokenRemainingTime = expiryTime - now.getTime()
             if (tokenRemainingTime <= FIVE_MINUTES) {
@@ -70,7 +60,7 @@ function SessionTimeout() {
             }
         }, ONE_SECOND)
         return () => clearInterval(interval)
-    }, [FIVE_MINUTES, expiryTime, handleLogout, handleStayLoggedIn, isIdle, isSessionTimeoutModalOpen, timeElapsed, timeRemaining])
+    }, [FIVE_MINUTES, expiryTime, handleLogout, handleStayLoggedIn, isIdle, isSessionTimeoutModalOpen, timeRemaining])
 
     return (
         <Modal open={isSessionTimeoutModalOpen} onClose={() => setIsSessionTimeoutModalOpen(false)} closeOnOverlayClick={false} closeOnEsc={false} showCloseIcon={false}>

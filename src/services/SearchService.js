@@ -49,7 +49,7 @@ const getSongsByAudioFeatures = (advancedSearchRequest) => {
         .then(res => {
             if (res.status === SUCCESS) {
                 const searchResults = res.songs.map(song => ({
-                    id: song.spotifyId,
+                    spotifyId: song.spotifyId,
                     name: song.name,
                     albumName: song.albumName,
                     artistName: song.artistName,

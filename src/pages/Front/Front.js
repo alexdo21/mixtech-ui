@@ -1,11 +1,12 @@
 import React from "react"
+import { LOGIN_ENDPOINT } from "../../services"
 
 function Front() {
     return (
         <div className="container" style={parentStyle}>
             <div className="container" style={style}>
                 <h1>Welcome to MixTech</h1>
-                <a href="http://localhost:8080/api/oauth2/authorization/spotify"><button type="button" className="btn btn-success btn-lg" style={{marginTop: "10px"}}>Login with Spotify</button></a>
+                <a href={LOGIN_ENDPOINT}><button type="button" className="btn btn-success btn-lg" style={{marginTop: "10px"}}>Login with Spotify</button></a>
             </div>
         </div>
     )
