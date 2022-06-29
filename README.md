@@ -32,24 +32,24 @@ It's important to first look at the core data that MixTech acts on. MixTech has 
 - **Playlists** are lists of songs that a MixTech user curates. They can either be in a match or not. The standard convention is that users should first add songs that go well together and then add similar matches to a playlists to create a "setlist". However, this restriction is not enforced and the user has a lot of choice in how they use MixTech.
 
 - **Songs** are extended and composite models for Spotify tracks. They contain both standard information as well as all of the audio features of a track.  Specifically a MixTech song has data on:
-        - Spotify ID
-        - song name
-        - album name
-        - artist name
-        - danceability
-        - energy
-        - key
-        - loudness
-        - mode
-        - speechiness
-        - acousticness
-        - instrumentalness
-        - liveness
-        - valence
-        - tempo
-        - duration
-        - time signature
-        - popularity
+    - Spotify ID
+    - song name
+    - album name
+    - artist name
+    - danceability
+    - energy
+    - key
+    - loudness
+    - mode
+    - speechiness
+    - acousticness
+    - instrumentalness
+    - liveness
+    - valence
+    - tempo
+    - duration
+    - time signature
+    - popularity
 Note that songs are only added to the database if they are added in a match or a playlist. This means that users can only perform advanced search queries a song in the database matches that query. Theoretically, with enough users most songs will be able to be queried via advanced search.
 
 - **Users** are the authenticated MixTech representations of a Spotify user. MixTech only stores data on a user's Spotify ID, email and name.
@@ -90,19 +90,19 @@ Everywhere a song is found in MixTech users can:
 
 A philosphy I had while implementing MixTech's security is to have the back end application contain and secure all of the resources and endpoints. If the user is not authenticated, the client application will redirect them to the login page. The most sensitive information in MixTech is the Spotify Access token that lets MixTech access resources Spotify. This token is only stored in the back end. Instead, authentication is done using a semi-stateless session with JSON web tokens. There are three main parts of the security implementation. They are described below.
 
-# OAuth2 Login
+### OAuth2 Login
 
 When the user logs in to MixTech, Java Spring Security will redirect them to sign in to Spotify (if they are not already logged in). If the user decides not to proceed with logging in, they are redirected to the login page again. If the user logs in successfully, Spring Security will request an authorization code from Spotify and exchange it for access and refresh tokens. These tokens will be saved by the SpotifyApi from the aforementioned Spotify API wrapper. This means that MixTech implements the authorization code flow. If OAuth2 is successful, the back-end application will issue a JSON web token (JWT) that last about as long as the Spotify access token, authenticate the user and redirect them back to the front-end application. An unsuccessful login will again redirect back to the login page, but a successfuly login will save the issued JWT to local storage and redirect them to a protected route (the actual application).
 
-# Application lifetime
+### Application lifetime
 
 While MixTech is being used, the front-end application will continue to check if the user is authenticated on every call to the back-end API. If any call returns a 401, MixTech will redirect the user to the login page, prompting the user to restart the authorization/authentication flow. MixTech will also keep track of idleness state using react-idle-timer. If a user has not been active on MixTech for 5 minutes, they are considered idle.
 
-# Staying logged in and refresh tokens
+### Staying logged in and refresh tokens
 
 The lifetime of the application is dependent on Spotify's access token, which lasts for one hour. However, the access token can be refreshed using a refresh token an unlimited amount of times. The idea is to prevent this access token from expiring and keep refreshing it if the user is still using the application, otherwise log them out. The critical time period for this implementation is 5 minutes before the access token expires. If the user is still active (i.e not idle) 5 minutes before the access token is set to expire, the front end will automatically make a call to the back end to refresh the access token and generate a new JWT for itself. The user will have no indication that this is happening, thus providing a smooth user experience. However, if the user is idle 5 minutes before the access token is set to expire, the front end will prompt the user via a modal to either stay logged in or log out. If the user clicks log out, they will be redirected to the login page. If the user clicks stay logged in, the back-end will refresh the access token and generate a new JWT. Otherwise, if the user remains idle after 5 minutes, the user will automatically be logged out. This prompt will only allow the user to click to stay logged in or log out, they cannot dismiss the modal.
 
-## Room for improvement
+# Room for improvement
 
 - ability to onboard non-spotify users without comprimising on security.
 - a revamp of the user interface using custom CSS and React components without relying Bootstrap and third-person library components.
