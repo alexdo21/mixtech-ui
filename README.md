@@ -1,68 +1,108 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# MixTech
 
-## Available Scripts
+# Intro
 
-In the project directory, you can run:
+A web application to help DJs and Musicians mix and find similar songs by interfacing directly with Spotify’s metadata on audio features.
 
-### `npm start`
+The tech stack of MixTech is:
+- React front end using Redux, Bootstrap 4, React Router and other third party components notably react-idle-timer, react-responsive-modal and react-input-range.
+- Java Spring Boot back end using a [Spotify API wrapper](https://github.com/spotify-web-api-java/spotify-web-api-java)
+- MySQL database
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Relevant repositories:
+- [MixTech API](https://github.com/alexdo21/mixtech-api)
+- [MixTech UI](https://github.com/alexdo21/mixtech-ui)
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+# Background
 
-### `npm test`
+MixTech is an application that first got started off as a group project for my database management systems class in Summer 2019. It was actually my first exposure to building a full-stack application using a React front end, a Java Spring Boot back end and a MySQL database. I was really interested in building an app that interfaces with the [Spotify API](https://developer.spotify.com/documentation/web-api/) since it had so much data on all of their songs. I thought it would be really cool to build an app that would be useful for DJs to find songs that mix well together using certain audio features such as key, tempo, time signature, etc. Or it could even be useful for everyday musicians like me to quickly find out about a song's key and modality (major or minor).
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+In 2022, I decided to completely refactor and rewrite a lot of the existing code base. Originally, all of the 300,000 songs in the application were scraped off of the Billboard's Top 200 Albums dating back to 1967. It was a very hackish way to get data into the application and was very complicated to do. Furthermore, the security implementation only used a JSON web token to authenticate resource access, and users had to be registered within the database in order to do anything with the app.
 
-### `npm run build`
+To improve on the user experience, I decided to integrate everything with Spotify. Users are now able to use their Spotify accounts as a single-sign-on (SSO) experience and be assured of a secure experience. Instead of querying songs from the database, users can directly query from Spotify through MixTech and it will return the 20 most popular results. I also added extra functionality. Users are now able to listen to songs in the app using a custom Spotify player much like ones found on the Spotify desktop/web/mobile apps. They are also able to add their playlists on MixTech directly to Spotify.
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+# Technical Details
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## Resource Data
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+It's important to first look at the core data that MixTech acts on. MixTech has four main resources:
 
-### `npm run eject`
+- **Matches** (either complete or incomplete) are pairs of songs that the user has decided goes well together. When a user adds a new match, it is known as an incomplete match. When a user decides to "pair" a match, that match will be considered a complete match.
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+- **Playlists** are lists of songs that a MixTech user curates. They can either be in a match or not. The standard convention is that users should first add songs that go well together and then add similar matches to a playlists to create a "setlist". However, this restriction is not enforced and the user has a lot of choice in how they use MixTech.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+- **Songs** are extended and composite models for Spotify tracks. They contain both standard information as well as all of the audio features of a track.  Specifically a MixTech song has data on:
+        - Spotify ID
+        - song name
+        - album name
+        - artist name
+        - danceability
+        - energy
+        - key
+        - loudness
+        - mode
+        - speechiness
+        - acousticness
+        - instrumentalness
+        - liveness
+        - valence
+        - tempo
+        - duration
+        - time signature
+        - popularity
+Note that songs are only added to the database if they are added in a match or a playlist. This means that users can only perform advanced search queries a song in the database matches that query. Theoretically, with enough users most songs will be able to be queried via advanced search.
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+- **Users** are the authenticated MixTech representations of a Spotify user. MixTech only stores data on a user's Spotify ID, email and name.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+## Endpoints
 
-## Learn More
+MixTech users can access these resources through four main ways, which are represented as the pages in the front-end application.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+- **Matches Page**
+    - get complete and incomplete matches
+    - delete an existing match
+    - add songs in match to a playlist
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+- **Playlists Page**
+    - get user playlists
+    - create a playlist
+    - delete a playlist
+    - view all songs in playlist
+    - create a match, pair a song to a match
 
-### Code Splitting
+- **Search Page**
+    - query songs from Spotify using any search query term (i.e song name, artist name, album name, etc.)
+    - create a match, pair a song to a match
+    - add a song to a playlist
+    - see complete matches matching the search query from all MixTech users  
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
+- **Advanced Search Page**
+    - query songs based on audio features (key, mode, time signature, duration, tempo, danceability, energy, loudness, speechiness, acousticness, instrumentalness, liveness, valence)
+    - create a match, pair a song to a match
+    - add a song to a playlist
+    - see complete matches matching the search query from all MixTech users  
 
-### Analyzing the Bundle Size
+Everywhere a song is found in MixTech users can:
+- view song details
+- play/pause the song through the custom MixTech Spotify player
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+## Security
 
-### Making a Progressive Web App
+A philosphy I had while implementing MixTech's security is to have the back end application contain and secure all of the resources and endpoints. If the user is not authenticated, the client application will redirect them to the login page. The most sensitive information in MixTech is the Spotify Access token that lets MixTech access resources Spotify. This token is only stored in the back end. Instead, authentication is done using a semi-stateless session with JSON web tokens. There are three main parts of the security implementation. They are described below.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+# OAuth2 Login
 
-### Advanced Configuration
+When the user logs in to MixTech, Java Spring Security will redirect them to sign in to Spotify (if they are not already logged in). If the user decides not to proceed with logging in, they are redirected to the login page again. If the user logs in successfully, Spring Security will request an authorization code from Spotify and exchange it for access and refresh tokens. These tokens will be saved by the SpotifyApi from the aforementioned Spotify API wrapper. This means that MixTech implements the authorization code flow. If OAuth2 is successful, the back-end application will issue a JSON web token (JWT) that last about as long as the Spotify access token, authenticate the user and redirect them back to the front-end application. An unsuccessful login will again redirect back to the login page, but a successfuly login will save the issued JWT to local storage and redirect them to a protected route (the actual application).
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
+# Application lifetime
 
-### Deployment
+While MixTech is being used, the front-end application will continue to check if the user is authenticated on every call to the back-end API. If any call returns a 401, MixTech will redirect the user to the login page, prompting the user to restart the authorization/authentication flow. MixTech will also keep track of idleness state using react-idle-timer. If a user has not been active on MixTech for 5 minutes, they are considered idle.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
+# Staying logged in and refresh tokens
 
-### `npm run build` fails to minify
+The lifetime of the application is dependent on Spotify's access token, which lasts for one hour. However, the access token can be refreshed using a refresh token an unlimited amount of times. The idea is to prevent this access token from expiring and keep refreshing it if the user is still using the application, otherwise log them out. The critical time period for this implementation is 5 minutes before the access token expires. If the user is still active (i.e not idle) 5 minutes before the access token is set to expire, the front end will automatically make a call to the back end to refresh the access token and generate a new JWT for itself. The user will have no indication that this is happening, thus providing a smooth user experience. However, if the user is idle 5 minutes before the access token is set to expire, the front end will prompt the user via a modal to either stay logged in or log out. If the user clicks log out, they will be redirected to the login page. If the user clicks stay logged in, the back-end will refresh the access token and generate a new JWT. Otherwise, if the user remains idle after 5 minutes, the user will automatically be logged out. This prompt will only allow the user to click to stay logged in or log out, they cannot dismiss the modal.
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+## Room for improvement
+
+- ability to onboard non-spotify users without comprimising on security.
+- a revamp of the user interface using custom CSS and React components without relying Bootstrap and third-person library components.
