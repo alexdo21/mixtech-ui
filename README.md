@@ -50,6 +50,7 @@ It's important to first look at the core data that MixTech acts on. MixTech has 
     - duration
     - time signature
     - popularity
+
 Note that songs are only added to the database if they are added in a match or a playlist. This means that users can only perform advanced search queries a song in the database matches that query. Theoretically, with enough users most songs will be able to be queried via advanced search.
 
 - **Users** are the authenticated MixTech representations of a Spotify user. MixTech only stores data on a user's Spotify ID, email and name.
