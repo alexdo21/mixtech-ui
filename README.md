@@ -1,17 +1,22 @@
 # MixTech
 
-# Intro
-
 A web application to help DJs and Musicians mix and find similar songs by interfacing directly with Spotify’s metadata on audio features.
 
 The tech stack of MixTech is:
-- React front end using Redux, Bootstrap 4, React Router and other third party components notably react-idle-timer, react-responsive-modal and react-input-range.
-- Java Spring Boot back end using a [Spotify API wrapper](https://github.com/spotify-web-api-java/spotify-web-api-java)
-- MySQL database
+- React front end using Redux, and other third party components most notably react-idle-timer, react-responsive-modal and react-input-range.
+- Java Spring Boot back end using a [Spotify API wrapper](https://github.com/spotify-web-api-java/spotify-web-api-java).
+- MySQL database.
 
 Relevant repositories:
 - [MixTech API](https://github.com/alexdo21/mixtech-api)
 - [MixTech UI](https://github.com/alexdo21/mixtech-ui)
+
+# Running Locally
+
+1. Clone both repositories.
+2. Setup a database server in MySQL and import the schema-mysql.sql file found in src/main/resources/ to create the mixtech database.
+3. Open MixTech API in IntelliJ and use the MixTech Local run configuration to start the application.
+4. In MixTech UI run npm install to download all required packages and npm start to start the application.
 
 # Background
 
@@ -23,9 +28,33 @@ To improve on the user experience, I decided to integrate everything with Spotif
 
 # Technical Details
 
+## MixTech API
+
+MixTech API was refactored extensively and is modeled after hexagonal architecture. There are three main layers. Each layer has specific interfaces that other layers can interact with and specific domain POJO onjects it acts on.
+
+- API Layer
+    - Interfaced by controllers
+    - Acts on and returns RestResponse objects
+
+- Application Layer
+    - Interfaced by services
+    - Acts on domain model objects
+
+- Ports Layer (database and third-person APIs)
+    - JPA port
+        - Interfaced by daos
+        - Acts on entity objects
+    - Spotify port
+        - Interfaced by clients
+        - Acts on relevant objects from the Spotify API wrapper
+
+## MixTech UI
+
+Previously MixTech UI used higher class components. It has since been all converted to functional components with relevant useEffects to replace componentDidMount and componentWillUnmount, and useState to replace component states. Additionally, the redux implementation has been been changed from connect to useSelector and dispatch hooks.
+
 ## Resource Data
 
-It's important to first look at the core data that MixTech acts on. MixTech has four main resources:
+It's important to look at the core data that MixTech acts on. MixTech has four main resources:
 
 - **Matches** (either complete or incomplete) are pairs of songs that the user has decided goes well together. When a user adds a new match, it is known as an incomplete match. When a user decides to "pair" a match, that match will be considered a complete match.
 
@@ -50,8 +79,8 @@ It's important to first look at the core data that MixTech acts on. MixTech has 
     - duration
     - time signature
     - popularity
-
-Note that songs are only added to the database if they are added in a match or a playlist. This means that users can only perform advanced search queries a song in the database matches that query. Theoretically, with enough users most songs will be able to be queried via advanced search.
+    
+    Note that songs are only added to the database if they are added in a match or a playlist. This means that users can only perform advanced search queries a song in the database matches that query. Theoretically, with enough users most songs will be able to be queried via advanced search.
 
 - **Users** are the authenticated MixTech representations of a Spotify user. MixTech only stores data on a user's Spotify ID, email and name.
 
@@ -87,6 +116,8 @@ Everywhere a song is found in MixTech users can:
 - view song details
 - play/pause the song through the custom MixTech Spotify player
 
+Note that the response value from the back end is standarized in a RESTful manner. Each response type DTO extends from the RestResponse parent class containing the fields status, description and errorMessage. The child class in turn provides the actual data the request asks for. The status can either be SUCCESS or FAILURE and the description indicates the type of data the client is asking for and the endpoint that it is requested at. If the status is a FAILURE, no data will be returned, instead a response will be returned and the errorMessage field will be populated with the specific exception message description that triggered an error.
+
 ## Security
 
 A philosphy I had while implementing MixTech's security is to have the back end application contain and secure all of the resources and endpoints. If the user is not authenticated, the client application will redirect them to the login page. The most sensitive information in MixTech is the Spotify Access token that lets MixTech access resources Spotify. This token is only stored in the back end. Instead, authentication is done using a semi-stateless session with JSON web tokens. There are three main parts of the security implementation. They are described below.
@@ -103,7 +134,8 @@ While MixTech is being used, the front-end application will continue to check if
 
 The lifetime of the application is dependent on Spotify's access token, which lasts for one hour. However, the access token can be refreshed using a refresh token an unlimited amount of times. The idea is to prevent this access token from expiring and keep refreshing it if the user is still using the application, otherwise log them out. The critical time period for this implementation is 5 minutes before the access token expires. If the user is still active (i.e not idle) 5 minutes before the access token is set to expire, the front end will automatically make a call to the back end to refresh the access token and generate a new JWT for itself. The user will have no indication that this is happening, thus providing a smooth user experience. However, if the user is idle 5 minutes before the access token is set to expire, the front end will prompt the user via a modal to either stay logged in or log out. If the user clicks log out, they will be redirected to the login page. If the user clicks stay logged in, the back-end will refresh the access token and generate a new JWT. Otherwise, if the user remains idle after 5 minutes, the user will automatically be logged out. This prompt will only allow the user to click to stay logged in or log out, they cannot dismiss the modal.
 
-# Room for improvement
+# Room For Improvement
 
-- ability to onboard non-spotify users without comprimising on security.
-- a revamp of the user interface using custom CSS and React components without relying Bootstrap and third-person library components.
+- Ability to onboard non-spotify users without comprimising on security.
+- A revamp of the user interface using custom CSS and React components without relying on Bootstrap and third-person components.
+- Add unit / integration tests.
